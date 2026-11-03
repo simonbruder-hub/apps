@@ -1,8 +1,9 @@
 /**
  * Das Formular des Lohnrechners: Werte so, wie sie getippt sind, und ihre Prüfung.
- * Die Startwerte sind ein neutrales Beispiel, kein echter Lohn.
+ * Die Startwerte sind ein neutrales Beispiel, kein echter Lohn; die Abzüge sind die Sätze 2026.
  */
 import type { Eingaben, Richtung } from './lohn';
+import type { Abzuege } from './netto';
 import { zahl } from './zahlen';
 
 export interface Formular {
@@ -16,6 +17,12 @@ export interface Formular {
   feiertage: string;
   /** Gearbeitete Stunden für den Verdienst */
   stunden: string;
+  /** Abzüge für den Nettolohn: Prozent, die Pensionskasse in Franken pro Monat */
+  ahv: string;
+  alv: string;
+  nbu: string;
+  ktg: string;
+  pk: string;
 }
 
 export const START: Formular = {
@@ -28,6 +35,11 @@ export const START: Formular = {
   ferientage: '25',
   feiertage: '9',
   stunden: '40',
+  ahv: '5.3',
+  alv: '1.1',
+  nbu: '1',
+  ktg: '0',
+  pk: '0',
 };
 
 export type Feld = Exclude<keyof Formular, 'richtung' | 'dreizehnter'>;
@@ -41,6 +53,11 @@ const GRENZEN: Record<Feld, [min: number, max: number, meldung: string]> = {
   ferientage: [0, 100, '0 bis 100 Tage'],
   feiertage: [0, 50, '0 bis 50 Tage'],
   stunden: [0, 744, '0 bis 744 Stunden'],
+  ahv: [0, 20, '0 bis 20 %'],
+  alv: [0, 10, '0 bis 10 %'],
+  nbu: [0, 10, '0 bis 10 %'],
+  ktg: [0, 10, '0 bis 10 %'],
+  pk: [0, 100_000, 'Betrag ab 0 eingeben'],
 };
 
 /** Liest ein Feld: Zahl im erlaubten Bereich oder Meldung */
@@ -50,8 +67,8 @@ export function feld(name: Feld, text: string): { wert: number } | { fehler: str
   return x === null || x < min || x > max ? { fehler: meldung } : { wert: x };
 }
 
-/** Prüft das Formular. Es zählt nur der Lohn der gewählten Richtung, die Stunden prüft der Verdienst selbst. */
-export function lesen(f: Formular): { eingaben: Eingaben | null; fehler: Partial<Record<Feld, string>> } {
+/** Liest Felder eines Formulars und sammelt dabei die Meldungen */
+function pruefer(f: Formular) {
   const fehler: Partial<Record<Feld, string>> = {};
   const wert = (name: Feld) => {
     const r = feld(name, f[name]);
@@ -61,6 +78,12 @@ export function lesen(f: Formular): { eingaben: Eingaben | null; fehler: Partial
     }
     return r.wert;
   };
+  return { fehler, wert };
+}
+
+/** Prüft das Formular. Es zählt nur der Lohn der gewählten Richtung, Stunden und Abzüge werden einzeln geprüft. */
+export function lesen(f: Formular): { eingaben: Eingaben | null; fehler: Partial<Record<Feld, string>> } {
+  const { fehler, wert } = pruefer(f);
   const eingaben: Eingaben = {
     richtung: f.richtung,
     monatslohn: f.richtung === 'monat' ? wert('monatslohn') : 0,
@@ -72,6 +95,19 @@ export function lesen(f: Formular): { eingaben: Eingaben | null; fehler: Partial
     feiertage: wert('feiertage'),
   };
   return { eingaben: Object.keys(fehler).length ? null : eingaben, fehler };
+}
+
+/** Prüft die Abzüge für den Nettolohn; aus Prozent werden Anteile (5.3 → 0.053) */
+export function abzuege(f: Formular): { abzuege: Abzuege | null; fehler: Partial<Record<Feld, string>> } {
+  const { fehler, wert } = pruefer(f);
+  const a: Abzuege = {
+    ahv: wert('ahv') / 100,
+    alv: wert('alv') / 100,
+    nbu: wert('nbu') / 100,
+    ktg: wert('ktg') / 100,
+    pk: wert('pk'),
+  };
+  return { abzuege: Object.keys(fehler).length ? null : a, fehler };
 }
 
 /** Gespeichertes Formular lesen; Unbekanntes oder Fehlendes kommt aus den Startwerten */

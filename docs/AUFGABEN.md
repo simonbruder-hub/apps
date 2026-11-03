@@ -42,6 +42,9 @@ in Kürze stehen in `CLAUDE.md` (lädt automatisch); `taktwerk/docs/STATUS.md` n
 - Lohnrechner (28.10.2026): aus der Excel-Vorlage «Berechnung ML auf Std.» eine eigene kleine App mit Karte unter
   «Für den Alltag». Gewünscht: freie Werte, rückwärts rechnen, Verdienst aus Stunden. Der echte Lohn aus der Vorlage
   kommt nicht auf die Website, nicht ins Repo und nicht in die Tests.
+- Nettolohn im Lohnrechner (03.11.2026, PR `simonbruder-hub/apps#14`): nur Sozialabzüge, keine Steuern. Die
+  Pensionskasse ist ein eigener Betrag pro Monat aus der Lohnabrechnung, keine Schätzung. Startwerte sind die Sätze
+  2026 (AHV/IV/EO 5.3 %, ALV 1.1 % bis 148'200 Fr.), Nichtberufsunfall 1 %, Krankentaggeld 0 %.
 - Study Hub (28.10.2026): vernetztes Formelbuch mit Simulationen und Lernhilfen als eigenes, öffentliches Projekt im
   Repo `simonbruder-hub/study-hub` (Briefing, Entscheide und Aufgaben dort). Das Lernlabor zieht dorthin um.
 - Bachelorarbeit: eigenes Repo und eigene Chats. Später App und Website dazu, jetzt nichts veröffentlichen,

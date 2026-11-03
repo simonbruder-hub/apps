@@ -1,4 +1,4 @@
-import { ausSpeicher, feld, lesen, START } from './formular';
+import { abzuege, ausSpeicher, feld, lesen, START } from './formular';
 
 describe('Formular prüfen', () => {
   it('liest die Startwerte als gültige Eingaben', () => {
@@ -27,6 +27,24 @@ describe('Formular prüfen', () => {
     expect(feld('stunden', '0')).toEqual({ wert: 0 });
     expect(feld('stunden', '800')).toEqual({ fehler: '0 bis 744 Stunden' });
     expect(feld('wochenstunden', '0')).toEqual({ fehler: '1 bis 80 Stunden' });
+  });
+});
+
+describe('Abzüge prüfen', () => {
+  it('liest die Startwerte als Anteile, die Pensionskasse in Franken', () => {
+    const { abzuege: a, fehler } = abzuege(START);
+    expect(fehler).toEqual({});
+    expect(a?.ahv).toBeCloseTo(0.053, 12);
+    expect(a?.alv).toBeCloseTo(0.011, 12);
+    expect(a?.nbu).toBeCloseTo(0.01, 12);
+    expect(a?.ktg).toBe(0);
+    expect(a?.pk).toBe(0);
+  });
+
+  it('meldet ungültige Abzüge, ohne den Lohn zu blockieren', () => {
+    const f = { ...START, ahv: '25', pk: "1'2'3x" };
+    expect(abzuege(f)).toEqual({ abzuege: null, fehler: { ahv: '0 bis 20 %', pk: 'Betrag ab 0 eingeben' } });
+    expect(lesen(f).fehler).toEqual({});
   });
 });
 
