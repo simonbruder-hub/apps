@@ -1,10 +1,11 @@
 /**
- * Lohnrechner auf einer Seite: Eingaben links, Ergebnis und Verdienst rechts (auf dem Handy untereinander).
+ * Lohnrechner auf einer Seite: Eingaben links, Ergebnis, Nettolohn und Verdienst rechts (auf dem Handy untereinander).
  * Jede Änderung rechnet sofort neu und landet im Speicher des Browsers.
  */
 import { useEffect, useState } from 'preact/hooks';
-import { type Feld, feld, type Formular, lesen, START } from './logic/formular';
+import { abzuege, type Feld, feld, type Formular, lesen, START } from './logic/formular';
 import { type Eingaben, type Ergebnis, rechne, verdienst } from './logic/lohn';
+import { type Abzuege, abziehen, type Netto, nettolohn } from './logic/netto';
 import { anzahl, franken, prozent } from './logic/zahlen';
 import { laden, speichern } from './speicher';
 
@@ -18,6 +19,7 @@ export function App() {
   useEffect(() => speichern(f), [f]);
   const setze: Setze = (k, v) => setF(alt => ({ ...alt, [k]: v }));
   const { eingaben, fehler } = lesen(f);
+  const { abzuege: a, fehler: abzugFehler } = abzuege(f);
   const r = eingaben ? rechne(eingaben) : null;
   return (
     <>
@@ -35,19 +37,21 @@ export function App() {
             <p class="lead">Monatslohn in Stundenlohn umrechnen und zurück, mit 13. Monatslohn, Ferien und Feiertagen.</p>
           </section>
           <div class="raster">
-            <Formularkarte f={f} setze={setze} fehler={fehler} zuruecksetzen={() => setF({ ...START })} />
+            <Formularkarte f={f} setze={setze} fehler={{ ...fehler, ...abzugFehler }} zuruecksetzen={() => setF({ ...START })} />
             <div class="spalte">
               {eingaben && r ? <Resultat e={eingaben} r={r} /> : (
                 <section class="card ergebnis">
                   <p class="panel-note" role="status">Bitte die rot markierten Felder prüfen.</p>
                 </section>
               )}
-              <VerdienstKarte f={f} setze={setze} r={r} />
+              {r && <NettoKarte r={r} a={a} />}
+              <VerdienstKarte f={f} setze={setze} r={r} a={a} />
             </div>
           </div>
           <p class="muted small fuss">
-            Alle Beträge brutto, also vor den Abzügen für AHV, ALV und Pensionskasse, und auf Rappen gerundet.
-            Deine Eingaben bleiben nur in diesem Browser.
+            Der Nettolohn ist nach den Abzügen für Sozialversicherungen und Pensionskasse, aber vor den Steuern.
+            Die Startwerte der Abzüge sind die Sätze 2026, die genauen Werte stehen auf deiner Lohnabrechnung.
+            Alle Beträge auf Rappen gerundet. Deine Eingaben bleiben nur in diesem Browser.
           </p>
         </div>
       </main>
@@ -96,6 +100,16 @@ function Formularkarte({ f, setze, fehler, zuruecksetzen }: {
         <Zahl name="ferientage" label="Ferientage pro Jahr" einheit="Tage" f={f} setze={setze} fehler={fehler} />
         <Zahl name="feiertage" label="Bezahlte Feiertage" einheit="Tage" f={f} setze={setze} fehler={fehler} />
       </div>
+      <fieldset class="gruppe">
+        <legend>Abzüge für den Nettolohn</legend>
+        <div class="felder">
+          <Zahl name="ahv" label="AHV/IV/EO" einheit="%" f={f} setze={setze} fehler={fehler} />
+          <Zahl name="alv" label="ALV" einheit="%" hinweis="Bis 148’200 Fr. im Jahr" f={f} setze={setze} fehler={fehler} />
+          <Zahl name="nbu" label="Nichtberufsunfall" einheit="%" hinweis="Unter 8 Stunden pro Woche: 0" f={f} setze={setze} fehler={fehler} />
+          <Zahl name="ktg" label="Krankentaggeld" einheit="%" f={f} setze={setze} fehler={fehler} />
+          <Zahl name="pk" label="Pensionskasse pro Monat" einheit="Fr." hinweis="Betrag aus der Lohnabrechnung" f={f} setze={setze} fehler={fehler} />
+        </div>
+      </fieldset>
       <button type="button" class="link" onClick={zuruecksetzen}>Beispielwerte laden</button>
     </form>
   );
@@ -173,10 +187,60 @@ function Resultat({ e, r }: { e: Eingaben; r: Ergebnis }) {
   );
 }
 
-function VerdienstKarte({ f, setze, r }: { f: Formular; setze: Setze; r: Ergebnis | null }) {
+/** Vom Bruttolohn über die Abzüge zum Nettolohn, wie auf einer Lohnabrechnung */
+function Abzugstabelle({ titel, n, a }: { titel: string; n: Netto; a: Abzuege }) {
+  return (
+    <table class="rechnung">
+      <caption class="sr-only">Vom Bruttolohn zum Nettolohn</caption>
+      <thead><tr><th scope="col">{titel}</th><th scope="col">Ansatz</th><th scope="col">Fr.</th></tr></thead>
+      <tbody>
+        <Zeile text="Bruttolohn" betrag={n.brutto} art="summe" />
+        <tr class="zwischentitel"><th scope="rowgroup" colSpan={3}>Abzüge</th></tr>
+        <Zeile text="AHV/IV/EO" satz={a.ahv} betrag={n.ahv} />
+        <Zeile text={n.begrenzt ? 'ALV, bis 148’200 Fr. im Jahr' : 'ALV'} satz={a.alv} betrag={n.alv} />
+        {a.nbu > 0 && <Zeile text={n.begrenzt ? 'Nichtberufsunfall, bis 148’200 Fr.' : 'Nichtberufsunfall'} satz={a.nbu} betrag={n.nbu} />}
+        {a.ktg > 0 && <Zeile text="Krankentaggeld" satz={a.ktg} betrag={n.ktg} />}
+        {n.pk > 0 && <Zeile text="Pensionskasse" betrag={n.pk} />}
+        <Zeile text="Total Abzüge" betrag={n.total} art="summe" />
+        <Zeile text="Nettolohn" betrag={n.netto} art="total" />
+      </tbody>
+    </table>
+  );
+}
+
+function NettoKarte({ r, a }: { r: Ergebnis; a: Abzuege | null }) {
+  if (!a) {
+    return (
+      <section class="card netto" aria-label="Nettolohn">
+        <p class="panel-note">Bitte die Abzüge prüfen.</p>
+      </section>
+    );
+  }
+  const n = nettolohn(r, a);
+  return (
+    <section class="card netto" aria-labelledby="netto-titel">
+      <p class="eyebrow" id="netto-titel">Nettolohn</p>
+      <p class="gross klein" aria-live="polite">
+        <span class="betrag" data-testid="netto">{franken(n.monat.netto)}</span>
+        <span class="einheit">Fr. pro Monat</span>
+      </p>
+      <p class="muted unter">nach den Abzügen, vor den Steuern</p>
+      <Abzugstabelle titel="Pro Monat" n={n.monat} a={a} />
+      <dl class="eckdaten">
+        {n.dreizehnter && <div><dt>13. Monatslohn netto</dt><dd>{franken(n.dreizehnter.netto)} Fr.</dd></div>}
+        <div><dt>Netto pro Stunde</dt><dd>{franken(n.stunde)} Fr.</dd></div>
+        <div><dt>Netto pro Jahr</dt><dd>{franken(n.jahr)} Fr.</dd></div>
+      </dl>
+    </section>
+  );
+}
+
+function VerdienstKarte({ f, setze, r, a }: { f: Formular; setze: Setze; r: Ergebnis | null; a: Abzuege | null }) {
   const gelesen = feld('stunden', f.stunden);
   const stunden = 'wert' in gelesen ? gelesen.wert : null;
   const v = r && stunden !== null ? verdienst(r, stunden) : null;
+  // Der Monat mit diesen Stunden zählt für den Höchstlohn, als ob jeder Monat so wäre
+  const n = v && a ? abziehen(v.brutto, v.brutto * 12, a) : null;
   // Ein leeres Feld ist kein Fehler, es gibt dann einfach noch keinen Verdienst
   const fehler: Fehler = 'fehler' in gelesen && f.stunden.trim() ? { stunden: gelesen.fehler } : {};
   return (
@@ -190,7 +254,10 @@ function VerdienstKarte({ f, setze, r }: { f: Formular; setze: Setze; r: Ergebni
               <span class="betrag" data-testid="verdienst">{franken(v.brutto)}</span>
               <span class="einheit">Fr. brutto</span>
             </p>
-            <p class="muted unter">{anzahl(stunden)} {stunden === 1 ? 'Stunde' : 'Stunden'} zu {franken(v.satz)} Fr.</p>
+            <p class="muted unter">
+              {anzahl(stunden)} {stunden === 1 ? 'Stunde' : 'Stunden'} zu {franken(v.satz)} Fr.
+              {n && <>, netto <span data-testid="verdienst-netto">{franken(n.netto)}</span> Fr.</>}
+            </p>
           </div>
           <table class="rechnung">
             <caption class="sr-only">Woraus der Verdienst besteht</caption>
@@ -202,6 +269,7 @@ function VerdienstKarte({ f, setze, r }: { f: Formular; setze: Setze; r: Ergebni
               <Zeile text="Feiertagszuschlag" satz={r.satz.feiertage} betrag={v.feiertage} />
             </tbody>
           </table>
+          {n && a && <Abzugstabelle titel={`Für ${anzahl(stunden)} ${stunden === 1 ? 'Stunde' : 'Stunden'}`} n={n} a={a} />}
         </>
       )}
     </section>
