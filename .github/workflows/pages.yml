@@ -20,61 +20,44 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+    # Supabase-Verbindung der veröffentlichten Apps (heute nur Taktwerk). Der Publishable key ist absichtlich
+    # öffentlich, die Daten schützt Row-Level-Security (siehe taktwerk/supabase/README.md). GitHub-Variablen
+    # mit denselben Namen haben Vorrang.
+    env:
+      VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL || 'https://xlbddpaxwjgseqxaicuf.supabase.co' }}
+      VITE_SUPABASE_ANON_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY || 'sb_publishable_HawYMwgitp0Jo9CmA31oIA_tA3Hd-ik' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: |
-            taktwerk/package-lock.json
-            lernlabor/package-lock.json
-            kochbuch/package-lock.json
-            lohn/package-lock.json
-      - name: Abhängigkeiten installieren
+          cache-dependency-path: '*/package-lock.json'
+      - name: App-Liste prüfen (apps.json)
+        run: node scripts/apps.mjs pruefen
+      - name: Apps bauen (alle mit website true aus apps.json)
+        run: |
+          for app in $(node scripts/apps.mjs website); do
+            echo "::group::$app"
+            (cd "$app" && npm ci && npm run build)
+            echo "::endgroup::"
+          done
+      - name: Taktwerk als Einzeldatei
         working-directory: taktwerk
-        run: npm ci
-      - name: Taktwerk bauen (PWA und Einzeldatei)
-        working-directory: taktwerk
-        # Supabase-Verbindung der veröffentlichten App. Der Publishable key ist absichtlich öffentlich,
-        # die Daten schützt Row-Level-Security (siehe taktwerk/supabase/README.md). GitHub-Variablen
-        # mit denselben Namen haben Vorrang.
-        env:
-          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL || 'https://xlbddpaxwjgseqxaicuf.supabase.co' }}
-          VITE_SUPABASE_ANON_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY || 'sb_publishable_HawYMwgitp0Jo9CmA31oIA_tA3Hd-ik' }}
-        run: |
-          npm run build
-          npm run build:single
-      - name: Lernlabor bauen (PWA)
-        working-directory: lernlabor
-        run: |
-          npm ci
-          npm run build
-      - name: Kochbuch bauen (PWA, ohne Rezepte)
-        working-directory: kochbuch
-        run: |
-          npm ci
-          npm run build
-      - name: Lohnrechner bauen (PWA)
-        working-directory: lohn
-        run: |
-          npm ci
-          npm run build
+        run: npm run build:single
       - name: Seite zusammenstellen
         run: |
-          mkdir -p _site/taktwerk _site/lernlabor _site/kochbuch _site/lohn
+          mkdir -p _site
           cp index.html _site/
-          # Bilder der Startseite für Apps aus anderen Repos (z. B. Haushalt aus haushaltskasse-app)
-          cp -r img _site/
-          cp -r taktwerk/site/. _site/taktwerk/
-          cp -r taktwerk/dist/app _site/taktwerk/app
+          # Gemeinsame Basis (Schriften, Farben) der Startseite und Bilder für Apps aus anderen Repos
+          cp -r gemeinsam img _site/
+          # Jede App: Weiterleitung und Infoseite aus site/, die App selbst unter app/
+          for app in $(node scripts/apps.mjs website); do
+            mkdir -p "_site/$app"
+            cp -r "$app/site/." "_site/$app/"
+            cp -r "$app/dist/app" "_site/$app/app"
+          done
           cp taktwerk/dist/single/index.html _site/taktwerk/taktwerk.html
-          cp -r lernlabor/dist/app _site/lernlabor/app
-          cp -r lernlabor/site/. _site/lernlabor/
-          cp -r kochbuch/dist/app _site/kochbuch/app
-          cp -r kochbuch/site/. _site/kochbuch/
-          cp -r lohn/dist/app _site/lohn/app
-          cp -r lohn/site/. _site/lohn/
           # Frühere Adresse (/pomodoro-planer/v2/) leitet auf die App weiter
           cp -r .github/pages-legacy/. _site/
       - uses: actions/configure-pages@v5

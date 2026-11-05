@@ -28,7 +28,7 @@ export function App() {
           <Logo />
           <span>Lohnrechner</span>
         </a>
-        <a class="top-link" href="../../">Alle Apps</a>
+        <a class="alle-apps" href="../../" title="Alle Apps"><span>Alle Apps</span></a>
       </header>
       <main>
         <div class="page">

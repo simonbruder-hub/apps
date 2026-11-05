@@ -19,6 +19,7 @@ import { allTags, deleteTag, renameTag, setTagColor, tagColor } from '../app/tag
 import { missingSchemaColumns } from '../sync/supabaseRemote';
 import { LERNLABOR_URL } from '../app/lernlabor';
 import { isDesktop } from '../app/desktop';
+import { alleAppsUrl, zeigeAlleApps } from '../app/alleApps';
 import { DesktopInfo } from '../ui/components/DesktopUpdate';
 
 type NumKey = 'focus_minutes' | 'short_break_minutes' | 'long_break_minutes' | 'long_break_every' | 'daily_goal_minutes';
@@ -376,6 +377,7 @@ function AppCard() {
         <p class="small">Android: in Chrome im Menü ⋮ «App installieren». Laptop: Installieren-Symbol in der Adressleiste von Chrome oder Edge.</p>
         <p class="small"><a href="../taktwerk.html" download>Einzeldatei herunterladen</a> (Notfall-Variante, offline per Doppelklick) · <a href="../">Startseite</a></p>
       </>}
+      {zeigeAlleApps() && <p class="small"><a href={alleAppsUrl()}>Alle Apps</a>: Kochbuch, Lohnrechner, Haushalt und mehr auf einer Seite.</p>}
       <p class="small"><a href={LERNLABOR_URL} target="_blank" rel="noopener">Lernlabor öffnen</a>: Elektrotechnik mit Schaltungsbaukasten (R, L, C, Quellen, Schalter), Oszilloskop, Theorie und Aufgaben in Stufen.</p>
     </section>
   );

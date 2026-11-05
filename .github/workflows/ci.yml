@@ -12,7 +12,52 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test:
+  # Liste aller Apps (apps.json) prüfen und für den gemeinsamen Job bereitstellen
+  apps:
+    name: App-Liste
+    runs-on: ubuntu-24.04
+    outputs:
+      standard: ${{ steps.liste.outputs.standard }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: apps.json, Ordner und Karten der Startseite prüfen
+        run: node scripts/apps.mjs pruefen
+      - id: liste
+        run: echo "standard=$(node scripts/apps.mjs ci)" >> "$GITHUB_OUTPUT"
+
+  # Gleicher Ablauf für jede App aus apps.json (ausser ci: "eigen")
+  app:
+    name: ${{ matrix.app }}
+    needs: apps
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        app: ${{ fromJSON(needs.apps.outputs.standard) }}
+    defaults:
+      run:
+        working-directory: ${{ matrix.app }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: ${{ matrix.app }}/package-lock.json
+      - run: npm ci
+      - name: Typprüfung
+        run: npm run typecheck
+      - name: Unit-Tests
+        run: npm test
+      - name: Build (PWA)
+        run: npm run build
+      - name: Browser installieren
+        run: npx playwright install --with-deps chromium
+      - name: End-to-End-Tests
+        run: npm run test:e2e
+
+  # Taktwerk hat einen eigenen Ablauf: Datenbank-Tests, Einzeldatei und Desktop-Build
+  taktwerk:
     runs-on: ubuntu-24.04
     defaults:
       run:
@@ -36,78 +81,6 @@ jobs:
           npm run build
           npm run build:single
           npm run build:desktop
-      - name: Browser installieren
-        run: npx playwright install --with-deps chromium
-      - name: End-to-End-Tests
-        run: npm run test:e2e
-
-  lernlabor:
-    runs-on: ubuntu-24.04
-    defaults:
-      run:
-        working-directory: lernlabor
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-          cache-dependency-path: lernlabor/package-lock.json
-      - run: npm ci
-      - name: Typprüfung
-        run: npm run typecheck
-      - name: Unit-Tests (Rechenkern und Aufgaben)
-        run: npm test
-      - name: Build (PWA)
-        run: npm run build
-      - name: Browser installieren
-        run: npx playwright install --with-deps chromium
-      - name: End-to-End-Tests
-        run: npm run test:e2e
-
-  kochbuch:
-    runs-on: ubuntu-24.04
-    defaults:
-      run:
-        working-directory: kochbuch
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-          cache-dependency-path: kochbuch/package-lock.json
-      - run: npm ci
-      - name: Typprüfung
-        run: npm run typecheck
-      - name: Unit-Tests (Laden, Filter, Mengen, Einkauf)
-        run: npm test
-      - name: Build (PWA)
-        run: npm run build
-      - name: Browser installieren
-        run: npx playwright install --with-deps chromium
-      - name: End-to-End-Tests
-        run: npm run test:e2e
-
-  lohn:
-    runs-on: ubuntu-24.04
-    defaults:
-      run:
-        working-directory: lohn
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-          cache-dependency-path: lohn/package-lock.json
-      - run: npm ci
-      - name: Typprüfung
-        run: npm run typecheck
-      - name: Unit-Tests (Zahlen, Umrechnen, Formular)
-        run: npm test
-      - name: Build (PWA)
-        run: npm run build
       - name: Browser installieren
         run: npx playwright install --with-deps chromium
       - name: End-to-End-Tests

@@ -54,7 +54,8 @@ Eingaben dürfen Tausendertrennzeichen und ein Komma enthalten (`5'000`, `37,5`)
 
 ## Technik
 
-Vite, Preact, TypeScript, PWA (offline), sonst keine Bibliotheken. Aufbau wie das Kochbuch.
+Vite, Preact, TypeScript, PWA (offline), sonst keine Bibliotheken. Aufbau wie das Kochbuch, Aussehen aus der
+gemeinsamen Basis `../gemeinsam/basis.css` (eigener Akzent: Violett).
 
 - `src/logic/`: Zahlen lesen und schreiben (`zahlen.ts`), Umrechnen und Verdienst (`lohn.ts`), Nettolohn (`netto.ts`), Formular und Prüfung (`formular.ts`)
 - `src/App.tsx`: die Seite, `src/speicher.ts`: Speicher im Browser

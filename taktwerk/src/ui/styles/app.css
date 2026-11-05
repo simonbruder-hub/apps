@@ -202,6 +202,8 @@ kbd {
 .nav-item.is-on .ic { color: var(--tomato); }
 .nav-item kbd { margin-left: auto; opacity: 0; transition: opacity 0.15s; }
 .nav-item:hover kbd, .nav-item:focus-visible kbd { opacity: 1; }
+/* «Alle Apps» oben rechts; auf dem Handy ist die Kopfzeile voll, dort steht der Link in den Einstellungen */
+.topbar .alle-apps { text-decoration: none; }
 .side-foot { margin-top: auto; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; padding: 0 2px; }
 
 .topbar, .tabbar { display: none; }
@@ -816,6 +818,7 @@ body.pip #pipRoot { min-height: 100vh; display: grid; align-items: center; }
 }
 @media (max-width: 520px) {
   .topbar .brand span { display: none; }
+  .topbar .alle-apps { display: none; }
   .phase-tab .mono { display: none; }
   .phase-tab { padding: 8px 12px; }
   .controls { gap: 12px; }

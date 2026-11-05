@@ -1,0 +1,172 @@
+/* Gemeinsame Basis der Apps auf https://simonbruder-hub.github.io/apps/
+ *
+ * Schriften, Grundfarben für hell und dunkel, Kopfzeile, Knöpfe, Felder und Karten. Die Grundfarben stammen aus
+ * dem Standardstil von Taktwerk. Jede App setzt nur ihre Akzentfarbe, zum Beispiel:
+ *
+ *   :root { --app-accent: #6a46c9; --app-accent-dark: #a98cff; --app-on-accent-dark: #1b1030; }
+ *
+ * --app-on-accent (Schrift auf dem Akzent) ist hell weiss; im Dunkeln braucht der hellere Akzent eine dunkle
+ * Schrift. Hell und dunkel folgen dem Gerät, data-theme="light" oder "dark" auf <html> legt eines fest.
+ * Einbinden: in einer App mit @import "../../../gemeinsam/basis.css"; auf der Startseite mit <link>.
+ * Übersicht und Beispiele: gemeinsam/README.md
+ */
+
+/* ---------- Schriften (Lizenz: schriften/OFL.txt) ---------- */
+@font-face { font-family: "Atkinson Hyperlegible"; font-style: normal; font-weight: 400; font-display: swap; src: url("schriften/atkinson-hyperlegible-400.woff2") format("woff2"); }
+@font-face { font-family: "Atkinson Hyperlegible"; font-style: normal; font-weight: 700; font-display: swap; src: url("schriften/atkinson-hyperlegible-700.woff2") format("woff2"); }
+@font-face { font-family: "Atkinson Hyperlegible"; font-style: italic; font-weight: 400; font-display: swap; src: url("schriften/atkinson-hyperlegible-400-kursiv.woff2") format("woff2"); }
+@font-face { font-family: "Bricolage Grotesque"; font-style: normal; font-weight: 200 800; font-display: swap; src: url("schriften/bricolage-grotesque.woff2") format("woff2"); }
+@font-face { font-family: "Martian Mono"; font-style: normal; font-weight: 100 800; font-display: swap; src: url("schriften/martian-mono.woff2") format("woff2"); }
+
+/* ---------- Farben und Masse ---------- */
+:root {
+  color-scheme: light;
+  --bg: #edf1f0;
+  --surface: #fbfcfc;
+  --surface-2: #f1f5f4;
+  --surface-3: #e3eae8;
+  --ink: #132024;
+  --ink-2: #3c4d53;
+  --muted: #5f7076;
+  --line: #d7dfdd;
+  --line-strong: #b9c6c4;
+  --good: #137a3d;
+  --warn: #965f00;
+  --bad: #b5302a;
+  --accent: var(--app-accent, #1d60b3);
+  --on-accent: var(--app-on-accent, #ffffff);
+  --mix: 12%;
+  --accent-soft: color-mix(in srgb, var(--accent) var(--mix), var(--surface));
+  --good-soft: color-mix(in srgb, var(--good) var(--mix), var(--surface));
+  --warn-soft: color-mix(in srgb, var(--warn) var(--mix), var(--surface));
+  --bad-soft: color-mix(in srgb, var(--bad) var(--mix), var(--surface));
+  --shadow: 0 1px 2px rgb(19 32 36 / 0.05), 0 12px 30px -20px rgb(19 32 36 / 0.3);
+  --radius: 14px;
+  --font-display: "Bricolage Grotesque", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-body: "Atkinson Hyperlegible", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "Martian Mono", ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #0d1214; --surface: #151b1e; --surface-2: #1b2326; --surface-3: #252f33;
+    --ink: #e3ebeb; --ink-2: #b4c2c4; --muted: #8b9b9e; --line: #263135; --line-strong: #3a4a50;
+    --good: #4cc77d; --warn: #e5a53d; --bad: #f2786b;
+    --accent: var(--app-accent-dark, #86b9f6); --on-accent: var(--app-on-accent-dark, #0d1214); --mix: 20%;
+    --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 14px 34px -20px rgb(0 0 0 / 0.8);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0d1214; --surface: #151b1e; --surface-2: #1b2326; --surface-3: #252f33;
+  --ink: #e3ebeb; --ink-2: #b4c2c4; --muted: #8b9b9e; --line: #263135; --line-strong: #3a4a50;
+  --good: #4cc77d; --warn: #e5a53d; --bad: #f2786b;
+  --accent: var(--app-accent-dark, #86b9f6); --on-accent: var(--app-on-accent-dark, #0d1214); --mix: 20%;
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 14px 34px -20px rgb(0 0 0 / 0.8);
+}
+
+/* ---------- Grundlagen ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.55 var(--font-body); }
+a { color: var(--accent); }
+h1, h2, h3 { font-family: var(--font-display); line-height: 1.2; margin: 0 0 0.4em; text-wrap: balance; }
+h1 { font-size: clamp(28px, 5vw, 40px); font-weight: 800; letter-spacing: -0.01em; }
+h2 { font-size: 21px; font-weight: 700; }
+h3 { font-size: 16px; font-weight: 700; }
+p { margin: 0 0 0.8em; }
+code { font-size: 0.92em; padding: 1px 5px; border-radius: 6px; background: var(--surface-2); border: 1px solid var(--line); }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.small { font-size: 13.5px; }
+.muted { color: var(--muted); }
+.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.boot { padding: 40px 16px; color: var(--muted); }
+
+/* ---------- Kopfzeile: Logo links, rechts Navigation und «Alle Apps» ---------- */
+.top { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: 12px; padding: 10px 16px; background: color-mix(in srgb, var(--bg) 88%, transparent); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+.brand { display: inline-flex; align-items: center; gap: 8px; margin-right: auto; font: 800 19px var(--font-display); color: var(--ink); text-decoration: none; }
+.brand-logo { width: 30px; height: 30px; flex: none; }
+.bl-bg { fill: var(--accent); }
+/* Zurück zur Startseite: <a class="alle-apps" href="../../"><span>Alle Apps</span></a> */
+.alle-apps { display: inline-flex; align-items: center; gap: 7px; flex: none; min-height: 36px; padding: 6px 12px 6px 10px; border-radius: 999px; color: var(--ink-2); font-weight: 700; font-size: 14.5px; text-decoration: none; white-space: nowrap; }
+.alle-apps::before { content: ""; width: 18px; height: 18px; flex: none; background: currentColor; -webkit-mask: var(--icon-apps) center / contain no-repeat; mask: var(--icon-apps) center / contain no-repeat; }
+.alle-apps:hover { background: var(--accent-soft); color: var(--accent); }
+:root { --icon-apps: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2'%3E%3Crect x='3.5' y='3.5' width='7' height='7' rx='2'/%3E%3Crect x='13.5' y='3.5' width='7' height='7' rx='2'/%3E%3Crect x='3.5' y='13.5' width='7' height='7' rx='2'/%3E%3Crect x='13.5' y='13.5' width='7' height='7' rx='2'/%3E%3C/svg%3E"); }
+@media (max-width: 520px) {
+  .top { gap: 8px; padding-inline: 12px; }
+  .alle-apps { padding: 6px 8px; }
+  .alle-apps span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+}
+
+/* ---------- Seite ---------- */
+main { max-width: 1120px; margin: 0 auto; padding: 22px 16px 72px; }
+.page { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; }
+.hero { padding: 12px 0 4px; }
+.lead { font-size: 18px; color: var(--ink-2); max-width: 62ch; margin: 0; }
+.eyebrow { margin: 0 0 4px; font-size: 12.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px; }
+.panel-note { padding: 14px 16px; border-radius: 12px; background: var(--surface-2); color: var(--ink-2); margin: 0; }
+.panel-note > p:last-child { margin-bottom: 0; }
+.panel-note.is-bad { background: var(--bad-soft); color: var(--bad); }
+.panel-note.is-good { background: var(--good-soft); color: var(--ink); }
+.aktionen { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+
+/* ---------- Knöpfe, Chips, Marken ---------- */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 40px; padding: 8px 14px; border-radius: 10px; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); font-weight: 700; font-size: 15px; text-decoration: none; cursor: pointer; }
+.btn:hover:not(:disabled) { border-color: var(--accent); }
+.btn:disabled { opacity: 0.45; cursor: default; }
+.btn-primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.btn-primary:hover:not(:disabled) { filter: brightness(1.08); }
+.btn-on, .btn.is-on { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+.btn-danger { color: var(--bad); }
+.btn-icon { display: inline-grid; place-items: center; min-width: 36px; height: 36px; border-radius: 9px; border: 1px solid var(--line-strong); background: var(--surface); cursor: pointer; font-size: 18px; line-height: 1; }
+.btn-icon:disabled { opacity: 0.4; cursor: default; }
+.btn-x { border: 0; background: none; cursor: pointer; font-size: 22px; line-height: 1; color: var(--muted); padding: 4px 8px; }
+.btn-x:hover { color: var(--bad); }
+.link { justify-self: start; border: 0; background: none; padding: 0; color: var(--accent); font-weight: 700; cursor: pointer; text-decoration: underline; }
+.chips { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; min-height: 34px; padding: 4px 12px; border-radius: 999px; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); font-weight: 700; font-size: 14px; cursor: pointer; }
+.chip:disabled { opacity: 0.4; cursor: default; }
+.chip.is-on { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.badge { display: inline-flex; align-items: center; gap: 5px; padding: 2px 9px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--line); font-size: 12.5px; font-weight: 700; color: var(--muted); white-space: nowrap; }
+
+/* ---------- Felder: Beschriftung, Eingabe mit Einheit, Hinweis oder Fehler ---------- */
+.feld { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; align-content: start; }
+.feld label { font-weight: 700; font-size: 14.5px; color: var(--ink-2); }
+.eingabe { display: flex; align-items: center; border: 1px solid var(--line-strong); border-radius: 12px; background: var(--surface); }
+.eingabe:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.eingabe input { flex: 1; width: 100%; min-width: 0; min-height: 46px; padding: 8px 12px; border: 0; background: none; font: 500 16px var(--font-mono); outline: none; }
+.eingabe .einheit { padding-right: 12px; color: var(--muted); font-size: 14px; }
+.feld-info { margin: 0; font-size: 13px; color: var(--muted); }
+.feld.is-fehler .eingabe { border-color: var(--bad); }
+.feld.is-fehler .feld-info { color: var(--bad); font-weight: 700; }
+/* Zwei Spalten; Beschriftung, Feld und Hinweis liegen in gemeinsamen Zeilen, damit die Felder bündig bleiben */
+.felder { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 14px; }
+.felder .feld { grid-row: span 3; grid-template-rows: subgrid; margin-bottom: 8px; }
+.felder .feld label { align-self: end; }
+/* Umschalter mit zwei Möglichkeiten: <div class="seg"><label class="is-on"><input type="radio">…</label>…</div> */
+.seg { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--line); }
+.seg label { position: relative; display: grid; place-items: center; min-height: 40px; border-radius: 9px; font-weight: 700; color: var(--ink-2); cursor: pointer; }
+.seg label.is-on { background: var(--accent); color: var(--on-accent); }
+.seg label:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
+.seg input { position: absolute; inset: 0; margin: 0; opacity: 0; cursor: pointer; }
+.schalter { display: flex; align-items: center; gap: 10px; font-weight: 700; cursor: pointer; }
+.schalter input { width: 20px; height: 20px; margin: 0; accent-color: var(--accent); }
+
+/* ---------- Ergebnis: grosse Zahl und Eckdaten ---------- */
+.gross { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; margin: 0; }
+.gross .betrag { font: 600 clamp(32px, 7vw, 44px)/1.15 var(--font-mono); letter-spacing: -0.03em; color: var(--accent); }
+.gross.klein .betrag { font-size: clamp(26px, 5vw, 32px); }
+.gross .einheit { font-weight: 700; color: var(--ink-2); }
+.eckdaten { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 16px 0 0; }
+.eckdaten div { padding: 10px 12px; border-radius: 12px; background: var(--surface-2); }
+.eckdaten dt { font-size: 12.5px; color: var(--muted); }
+.eckdaten dd { margin: 2px 0 0; font: 600 13.5px var(--font-mono); white-space: nowrap; }
+
+/* ---------- Meldung unten ---------- */
+.toast { position: fixed; left: 50%; bottom: 20px; z-index: 30; transform: translateX(-50%); width: max-content; max-width: calc(100vw - 32px); padding: 10px 16px; border-radius: 12px; background: var(--ink); color: var(--bg); font-weight: 700; box-shadow: var(--shadow); animation: toast-hoch 0.2s ease-out; }
+@keyframes toast-hoch { from { opacity: 0; transform: translate(-50%, 8px); } }
+@media (prefers-reduced-motion: reduce) { .toast { animation: none; } }

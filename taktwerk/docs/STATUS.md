@@ -102,6 +102,11 @@ die App unter `https://simonbruder-hub.github.io/apps/taktwerk/app/`.
   ungerundet und kommt bei 40 und 42 Wochenstunden auf dieselben Beträge. Eingaben nur im Browser (`lohn.formular.v1`), Startwerte
   sind ein Beispiel, kein echter Lohn. Karte unter «Für den Alltag». Tests: Vitest und Playwright, CI-Job `lohn`,
   Pages baut `/lohn/app/`.
+- **Einheitliches Design und Struktur** (Aufgabe 4, zweiter Schritt, PR `simonbruder-hub/apps#15`): gemeinsame Basis
+  `../../gemeinsam/basis.css` (Schriften im Repo, Grundfarben aus dem Standardstil von Taktwerk) für Startseite,
+  Kochbuch, Lohnrechner und die neue Vorlage `../../vorlage/`; Liste `../../apps.json`, CI mit einem Job pro App.
+  Taktwerk behält seine Stile und bekommt «Alle Apps» oben rechts (ab 521 px Breite; schmaler in den Einstellungen),
+  nicht in Desktop-App und Einzeldatei (`src/app/alleApps.ts`).
 
 ## Offen
 
@@ -115,7 +120,8 @@ die App unter `https://simonbruder-hub.github.io/apps/taktwerk/app/`.
 3. **Lernlabor ausbauen** (zieht in den Study Hub um, Repo `simonbruder-hub/study-hub`; nächste Schritte in `docs/LERNAPP.md`): Diode, Transistor, OP; mehr Aufgaben;
    Fächer Elektromagnetismus, Physik, Chemie, Mathematik in Stufen.
 4. Optional: eigener Superhelden-Stil (eigene Figur).
-5. Ziel danach: eigene Accounts für die Website mit beiden Apps, online und offline auf allen Geräten.
+5. Gemeinsame Konten für Taktwerk, Haushalt und Kochbuch, online und offline auf allen Geräten: Plan in
+   `../../docs/AUFGABEN.md`, Aufgabe 7.
 6. Bekannt: der E2E-Test «läuft nach dem Neuladen an der richtigen Stelle weiter» schlägt lokal im Profil «mobile» fehl
    (auch ohne die neuen Änderungen), in CI prüfen.
 7. Dschungelschlange optional ebenfalls in 3D.
