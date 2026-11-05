@@ -4,6 +4,7 @@ import { prefs } from './app/prefs';
 import { go, view, VIEWS, type ViewName } from './app/router';
 import { loaded } from './app/store';
 import { isDesktop } from './app/desktop';
+import { alleAppsUrl, zeigeAlleApps } from './app/alleApps';
 import { expand, minimize, pipOpen } from './app/pip';
 import { ModeSwitch, SideTimer, SyncIndicator } from './ui/components/Chrome';
 import { Dock, dockVisible, MiniPlayer } from './ui/components/Mini';
@@ -92,6 +93,9 @@ export function App() {
             >
               <Icon name="minimize" />
             </button>
+            {zeigeAlleApps() && (
+              <a class="icon-btn alle-apps" href={alleAppsUrl()} title="Alle Apps" aria-label="Alle Apps"><Icon name="apps" /></a>
+            )}
           </header>
           <main id="main" class="main" tabIndex={-1}>
             {loaded.value ? <View /> : <div class="boot">Deine Daten werden geladen …</div>}

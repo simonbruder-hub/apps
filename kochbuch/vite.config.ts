@@ -29,8 +29,8 @@ export default defineConfig({
         start_url: './',
         scope: './',
         display: 'standalone',
-        background_color: '#f4efe8',
-        theme_color: '#f4efe8',
+        background_color: '#edf1f0',
+        theme_color: '#edf1f0',
         categories: ['food', 'lifestyle'],
         icons: [
           { src: 'icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
@@ -45,11 +45,6 @@ export default defineConfig({
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
         navigateFallback: 'index.html',
-        runtimeCaching: [{
-          urlPattern: ({ url }) => url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com',
-          handler: 'StaleWhileRevalidate',
-          options: { cacheName: 'fonts', expiration: { maxEntries: 30, maxAgeSeconds: 60 * 60 * 24 * 365 } },
-        }],
       },
     }),
   ],
@@ -58,5 +53,6 @@ export default defineConfig({
     emptyOutDir: true,
     target: 'es2022',
   },
-  server: { port: 5175, fs: { allow: [fileURLToPath(new URL('.', import.meta.url))] } },
+  // Die gemeinsame Basis (Schriften, Farben) liegt ausserhalb des App-Ordners in ../gemeinsam
+  server: { port: 5175, fs: { allow: [fileURLToPath(new URL('.', import.meta.url)), fileURLToPath(new URL('../gemeinsam', import.meta.url))] } },
 });

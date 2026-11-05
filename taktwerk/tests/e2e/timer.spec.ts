@@ -98,6 +98,20 @@ test.describe('Timer', () => {
     await expect(page.locator('.dock')).toHaveCount(0);
   });
 
+  test('«Alle Apps» führt zur gemeinsamen Startseite, auf dem Handy über die Einstellungen', async ({ page }) => {
+    await openApp(page);
+    const oben = page.locator('.topbar a.alle-apps');
+    // bis 520 px ist die Kopfzeile voll, dort steht der Link nur in den Einstellungen
+    if ((page.viewportSize()?.width ?? 1280) <= 520) {
+      await expect(oben).toBeHidden();
+      await nav(page, 'Einstellungen');
+      await expect(page.getByRole('link', { name: 'Alle Apps', exact: true })).toHaveAttribute('href', 'https://simonbruder-hub.github.io/apps/');
+    } else {
+      await expect(oben).toBeVisible();
+      await expect(oben).toHaveAttribute('href', 'https://simonbruder-hub.github.io/apps/');
+    }
+  });
+
   test('Logo führt zur Fokus-Ansicht, der Timer läuft weiter', async ({ page }) => {
     await page.clock.install();
     await openApp(page);

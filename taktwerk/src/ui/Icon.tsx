@@ -2,7 +2,7 @@ export type IconName =
   | 'timer' | 'list' | 'folder' | 'calendar' | 'chart' | 'sliders' | 'play' | 'pause' | 'plus' | 'minus'
   | 'check' | 'x' | 'trash' | 'edit' | 'chevron-left' | 'chevron-right' | 'skip' | 'reset' | 'flag'
   | 'download' | 'upload' | 'copy' | 'clock' | 'bell' | 'sun' | 'moon' | 'auto' | 'minimize' | 'expand'
-  | 'cloud' | 'cloud-off' | 'sync' | 'book' | 'briefcase' | 'stop' | 'stopwatch' | 'user' | 'warn';
+  | 'cloud' | 'cloud-off' | 'sync' | 'book' | 'briefcase' | 'stop' | 'stopwatch' | 'user' | 'warn' | 'apps';
 
 /** Symbol aus dem SVG-Sprite in index.html */
 export function Icon({ name, class: cls }: { name: IconName; class?: string }) {

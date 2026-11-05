@@ -49,6 +49,7 @@ function Header() {
               : <><circle cx="12" cy="12" r="8.5" /><path d="M12 3.5v17a8.5 8.5 0 0 0 0-17z" class="fill" /></>}
         </svg>
       </button>
+      <a class="alle-apps" href="../../" title="Alle Apps"><span>Alle Apps</span></a>
     </header>
   );
 }

@@ -1,0 +1,21 @@
+/* Vorlage: gemeinsame Basis aller Apps (gemeinsam/basis.css), dazu nur die eigene Farbe und eigene Bausteine */
+@import "../../../gemeinsam/basis.css";
+
+/* Eigene Akzentfarbe wählen: hell, im Dunkeln heller, dazu die Schrift auf dem dunklen Akzent */
+:root {
+  --app-accent: #1f7a8c;
+  --app-accent-dark: #5cc4d6;
+  --app-on-accent-dark: #0d1214;
+}
+
+/* Formeln nicht umbrechen */
+.formel { white-space: nowrap; }
+
+/* Logo */
+.bl-strich { fill: none; stroke: var(--on-accent); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* Eingaben und Ergebnis nebeneinander, auf dem Handy untereinander */
+.raster { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; align-items: start; }
+@media (min-width: 760px) {
+  .raster { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+}

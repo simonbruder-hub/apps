@@ -12,3 +12,13 @@ Eigene Apps für Studium und Alltag, alle auf einer gemeinsamen Website. Das Rep
 Website: <https://simonbruder-hub.github.io/apps/> (gemeinsame Startseite, `index.html`), Taktwerk unter `/taktwerk/app/`, Lernlabor unter `/lernlabor/app/`, Kochbuch unter `/kochbuch/app/`, Lohnrechner unter `/lohn/app/`.
 Haushalt läuft unter `/haushaltskasse-app/neu/`, Kasse unterwegs unter `/haushaltskasse-app/`. Vorschaubilder der Startseite für
 Apps aus anderen Repos liegen in `img/`.
+
+## Aufbau
+
+| Ordner oder Datei | Inhalt |
+|---|---|
+| `apps.json` | Liste aller Apps. CI und GitHub Pages bauen daraus, `node scripts/apps.mjs pruefen` prüft Ordner und Karten der Startseite |
+| [`gemeinsam/`](gemeinsam/) | Gemeinsames Aussehen: Schriften, Farben hell und dunkel, Knöpfe, Felder, Karten; jede App setzt nur ihre Akzentfarbe |
+| [`vorlage/`](vorlage/) | Leere App mit Beispiel und Tests; Anleitung für eine neue App im README dort |
+| `index.html` | Startseite mit einer Karte pro App |
+| `docs/AUFGABEN.md` | Aufgaben und Entscheide |

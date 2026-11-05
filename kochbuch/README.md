@@ -50,7 +50,7 @@ sie den Zettel genauso übernehmen; `src/logic/kasse.ts` zeigt, wie.
 ## Technik
 
 Vite, Preact, TypeScript, PWA (offline), sonst keine Bibliotheken. Das ZIP liest ein kleiner eigener Leser mit
-`DecompressionStream` des Browsers.
+`DecompressionStream` des Browsers. Aussehen aus der gemeinsamen Basis `../gemeinsam/basis.css` (eigener Akzent: Kürbis).
 
 - `src/data/`: Format (`types.ts`), Prüfung (`pruefen.ts`), JSON und ZIP lesen (`laden.ts`, `zip.ts`), Speicher (`speicher.ts`)
 - `src/logic/`: Filter und Suche (`filter.ts`), Mengen umrechnen (`mengen.ts`), Einkaufszettel (`einkauf.ts`), Kasse unterwegs (`kasse.ts`)

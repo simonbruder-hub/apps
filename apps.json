@@ -1,0 +1,11 @@
+{
+  "hinweis": "Liste aller Apps. CI und GitHub Pages bauen jede App mit ordner. website: true veröffentlicht sie unter /<ordner>/app/ und verlangt eine Karte auf der Startseite. ci: eigen hat einen eigenen CI-Job. Apps mit adresse liegen in anderen Repos und sind nur verlinkt. Prüfen: node scripts/apps.mjs pruefen",
+  "apps": [
+    { "name": "Taktwerk", "ordner": "taktwerk", "website": true, "ci": "eigen" },
+    { "name": "Lernlabor", "ordner": "lernlabor", "website": true },
+    { "name": "Kochbuch", "ordner": "kochbuch", "website": true },
+    { "name": "Lohnrechner", "ordner": "lohn", "website": true },
+    { "name": "Vorlage", "ordner": "vorlage", "website": false },
+    { "name": "Haushalt", "repo": "simonbruder-hub/haushaltskasse-app", "adresse": "https://simonbruder-hub.github.io/haushaltskasse-app/neu/" }
+  ]
+}

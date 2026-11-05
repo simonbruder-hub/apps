@@ -45,6 +45,11 @@ in Kürze stehen in `CLAUDE.md` (lädt automatisch); `taktwerk/docs/STATUS.md` n
 - Nettolohn im Lohnrechner (03.11.2026, PR `simonbruder-hub/apps#14`): nur Sozialabzüge, keine Steuern. Die
   Pensionskasse ist ein eigener Betrag pro Monat aus der Lohnabrechnung, keine Schätzung. Startwerte sind die Sätze
   2026 (AHV/IV/EO 5.3 %, ALV 1.1 % bis 148'200 Fr.), Nichtberufsunfall 1 %, Krankentaggeld 0 %.
+- Design und Struktur (05.11.2026, Aufgabe 4, PR `simonbruder-hub/apps#15`): Basis gleich, Farbe eigen. Gemeinsame
+  `gemeinsam/basis.css` (Schriften im Repo statt bei Google, Grundfarben aus dem Standardstil von Taktwerk), jede App
+  nur mit eigener Akzentfarbe, in jeder App «Alle Apps». Taktwerk behält seine 17 Stile. Neue Apps aus `vorlage/`, alle
+  Apps in `apps.json`, danach bauen CI und Pages. Apps aus anderen Repos (Haushalt, später Bachelorarbeit) bleiben
+  verlinkt. Konten: privat zusammen, der Study Hub getrennt (Aufgabe 7).
 - Study Hub (28.10.2026): vernetztes Formelbuch mit Simulationen und Lernhilfen als eigenes, öffentliches Projekt im
   Repo `simonbruder-hub/study-hub` (Briefing, Entscheide und Aufgaben dort). Das Lernlabor zieht dorthin um.
 - Bachelorarbeit: eigenes Repo und eigene Chats. Später App und Website dazu, jetzt nichts veröffentlichen,
@@ -75,15 +80,11 @@ in Kürze stehen in `CLAUDE.md` (lädt automatisch); `taktwerk/docs/STATUS.md` n
    - Lokale LaTeX- und PDF-Teile ins Repo übernehmen.
    - Python-Skript liest die Vorlage und erzeugt die Daten (JSON) für die App. Das Kochbuch bleibt die
      einzige Quelle.
-4. **Website als App-Sammlung** (dieses Repo). Erster Schritt erledigt (PR `simonbruder-hub/apps#11`, siehe
-   STATUS.md): Karte «Haushalt» auf der Startseite (Abschnitt «Für den Alltag», neben dem Kochbuch) und Link in der
-   Kopfzeile, die App bleibt im eigenen Repo. Dazu der Lohnrechner als eigene App `lohn/` (PR
-   `simonbruder-hub/apps#12`, siehe STATUS.md). Offen: einheitliches Design, gemeinsame Konten, Struktur für weitere
-   Apps (auch die Bachelorarbeit); danach entscheiden, ob die Haushalt-App doch hierher kommt. Den Knopf
-   «Kasse unterwegs» auf der Karte entfernen, sobald die neue App eine Einkaufsliste hat (dort M6).
-   Ursprünglicher Auftrag: Haushaltsapp (Repo `simonbruder-hub/haushaltskasse-app`, nur Finanzen und Einkauf)
-   einbinden. Vorschlag: ins Repo übernehmen oder aus dem eigenen Repo bauen. Einheitliches Design, später
-   gemeinsame Konten, Struktur für weitere Apps (auch die Bachelorarbeit).
+4. **Website als App-Sammlung** (dieses Repo). Erledigt: Karte «Haushalt» (PR `simonbruder-hub/apps#11`), Lohnrechner
+   (PR `simonbruder-hub/apps#12`, `#14`), einheitliches Design und Struktur für neue Apps (PR `simonbruder-hub/apps#15`,
+   siehe Entscheide). Offen: gemeinsame Konten (Aufgabe 7), danach entscheiden, ob die Haushalt-App hierher kommt
+   (bis dahin verlinkt; ihre Schriften und Farben dann an `gemeinsam/basis.css` angleichen). Den Knopf «Kasse
+   unterwegs» auf der Karte entfernen, sobald die neue App eine Einkaufsliste hat (dort M6).
 5. **Kochbuch-App** (erledigt: PR `simonbruder-hub/apps#8`, App `kochbuch/`, siehe STATUS.md und
    `kochbuch/README.md`). Offen: auf dem Handy
    prüfen (ZIP aus der Kochbuch-CI laden, an Kasse unterwegs senden), Grundvorrat-Liste in `src/logic/einkauf.ts`
@@ -97,6 +98,23 @@ in Kürze stehen in `CLAUDE.md` (lädt automatisch); `taktwerk/docs/STATUS.md` n
 
 6. **Study Hub** (eigenes Repo `simonbruder-hub/study-hub`, Startsatz dort). Hier betrifft es nur den Umzug des
    Lernlabors: Startseite, Links in Taktwerk und eine Weiterleitung auf die neue Adresse, sobald es dort läuft.
+7. **Gemeinsame Konten** (Plan; Entscheid 05.11.2026: privat zusammen). Eine Anmeldung für Taktwerk, Haushalt und
+   später Kochbuch. Der Study Hub mit Konten anderer Studierender bleibt getrennt im zweiten Supabase-Projekt
+   (Free-Plan: 2 aktive Projekte pro Konto; heute haben Taktwerk und Haushalt je eines).
+   - Zuerst mit Simon im Supabase-Dashboard klären, welche Projekte es gibt und wo welche Daten liegen. Vorschlag: das
+     Projekt von Taktwerk wird das gemeinsame (seine Adresse steckt in Website und Desktop-App, kein neues Release
+     nötig), der Haushalt zieht dorthin um, das frei werdende Projekt bekommt der Study Hub.
+   - Jede App mit eigenem Schema und Row Level Security wie bisher: Taktwerk bleibt in `public`, dazu `haushalt`, später
+     `kochbuch`; neue Schemas in Supabase unter «Exposed schemas» freigeben.
+   - Eine Sitzung für alle: die Apps liegen auf `simonbruder-hub.github.io` und teilen den Browser-Speicher. Mit
+     derselben Projekt-URL und demselben `storageKey` reicht eine Anmeldung. Gemeinsames Modul `gemeinsam/konto.ts`
+     (nur supabase-js, ohne Preact oder React); der Haushalt übernimmt es als Kopie in sein Repo.
+   - Anmeldung mit Code aus der Mail statt Link (Mailvorlage mit `{{ .Token }}`, löst den 404-Link), Site URL
+     `https://simonbruder-hub.github.io/apps/`, Redirect URLs aller Apps. Neue Konten nur für eigene Adressen.
+   - Daten des Haushalts umziehen (vorher sichern; Export und Import oder neu hochladen von den Handys), dann das alte
+     Projekt löschen. Im Repo `study-hub` vermerken, dass er das frei werdende Projekt bekommt.
+   - Danach: Kochbuch über das Konto synchronisieren (STATUS.md, Offen 10). Pages gibt die Supabase-Verbindung schon
+     allen Apps mit (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` in `pages.yml`).
 
 ## Später
 
@@ -113,8 +131,12 @@ in Kürze stehen in `CLAUDE.md` (lädt automatisch); `taktwerk/docs/STATUS.md` n
 
 ## Technische Hinweise
 
-- In `taktwerk/`, `lernlabor/`, `kochbuch/` und `lohn/`: `npm run typecheck`, `npm test`, `npm run build`, `npm run test:e2e`;
-  in `taktwerk/` dazu `npm run build:single`.
+- In jedem App-Ordner aus `apps.json` (`taktwerk/`, `lernlabor/`, `kochbuch/`, `lohn/`, `vorlage/`): `npm run typecheck`,
+  `npm test`, `npm run build`, `npm run test:e2e`; in `taktwerk/` dazu `npm run build:single`. Im Repo-Ordner
+  `node scripts/apps.mjs pruefen` (Liste, Ordner, Karten der Startseite). CI: ein Job pro App aus der Liste, Taktwerk
+  mit eigenem Job.
+- Aussehen: `gemeinsam/basis.css` gilt für Startseite, Kochbuch, Lohnrechner und Vorlage. Nach Änderungen dort alle
+  vier ansehen (hell, dunkel, 360 px breit) und ihre Tests laufen lassen.
 - Playwright in der Cloud: Chromium unter `/opt/pw-browsers/chromium`. Lokale Config mit
   `launchOptions.executablePath`, nicht committen. Der Testbrowser ohne Bildschirm erlaubt Ton immer,
   `tests/e2e/sound.spec.ts` bildet die Ton-Sperre darum nach.

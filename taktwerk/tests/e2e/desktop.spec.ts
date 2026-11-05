@@ -43,6 +43,9 @@ test.describe('Desktop-App', () => {
     await expect(page.locator('#main .boot')).toHaveCount(0);
     expect(await calls(page, 'main_show')).toHaveLength(1);
 
+    // Die Desktop-App läuft für sich: kein Link auf die Startseite aller Apps
+    await expect(page.locator('a.alle-apps')).toHaveCount(0);
+
     await page.keyboard.press('m');
     await expect.poll(() => calls(page, 'widget_open')).toEqual([{ place: true }]);
     await expect(page.locator('.mini-root')).toHaveCount(0);

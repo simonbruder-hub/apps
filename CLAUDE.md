@@ -12,8 +12,11 @@ Diese Datei lädt in jedem Chat automatisch. Kurz halten, nur Orientierung.
 | `kochbuch/` | Rezepte filtern, Portionen, Einkauf; die Rezepte kommen aus dem privaten Repo `Kochbuch_Altstetten` | `kochbuch/README.md` |
 | `lohn/` | Lohnrechner: Monatslohn und Stundenlohn umrechnen, nach der Excel-Vorlage «Berechnung ML auf Std.» | `lohn/README.md` |
 | `lernlabor/` | Elektrotechnik-Lernapp; vorerst stillgelegt, soll in den Study Hub (Repo `study-hub`) umziehen | `lernlabor/README.md` |
+| `vorlage/` | Leere App mit Beispiel und Tests, Ausgangspunkt für neue Apps (nicht veröffentlicht) | `vorlage/README.md` |
+| `gemeinsam/` | Gemeinsames Aussehen: `basis.css` mit Schriften, Farben, Bausteinen; jede App setzt nur ihre Akzentfarbe | `gemeinsam/README.md` |
 
 Die Haushalt-App ist nur auf der Startseite verlinkt, sie liegt im eigenen Repo `haushaltskasse-app`.
+`apps.json` listet alle Apps; CI und Pages bauen daraus. Neue App: `vorlage/README.md`.
 
 **Neuer Chat:** «Mach Aufgabe N aus docs/AUFGABEN.md.» Dort stehen Entscheide, Aufgaben und technische Hinweise.
 `taktwerk/docs/STATUS.md` nur für Aufgaben zu Taktwerk lesen.
@@ -38,6 +41,7 @@ npm run build
 PW_CHROMIUM=/opt/pw-browsers/chromium npm run test:e2e
 npm run db:test        # nur taktwerk, braucht PostgreSQL 16
 npm run build:single   # nur taktwerk
+node scripts/apps.mjs pruefen   # im Repo-Ordner: apps.json, Ordner und Karten der Startseite
 ```
 
 ## Stolpersteine in der Cloud
@@ -48,6 +52,9 @@ npm run build:single   # nur taktwerk
 - Neuer Branch: zusätzlich `git config --add remote.origin.fetch +refs/heads/<branch>:refs/remotes/origin/<branch>`,
   sonst meldet der Stop-Hook ihn als nicht gepusht.
 - `pkill` nur in einem eigenen Aufruf und mit Klammer im Muster: `pkill -f "vite previe[w]"`.
+- Taktwerk-E2E: die Config kennt `PW_CHROMIUM` nicht; lokal eine `playwright.local.config.ts` mit
+  `launchOptions.executablePath` anlegen (nicht committen) und `npx playwright test -c playwright.local.config.ts`.
+- `npm run build:single` in Taktwerk überschreibt `download/taktwerk.html`; nicht mitcommitten, ausser gewollt.
 - Unicode-Escapes (Backslash, u, vier Hexziffern) nicht mit dem Write-Werkzeug schreiben, es macht echte Zeichen
   daraus; solche Stellen per Skript schreiben.
 - Weitere Hinweise (Desktop-App, Kochbuch-Repo, 3D-Spiele, bekannte wacklige Tests): `docs/AUFGABEN.md`, Abschnitt
