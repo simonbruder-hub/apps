@@ -7,6 +7,11 @@ Anmeldung und Realtime).
 
 Einmaliger Aufwand: etwa 15 Minuten. Du brauchst ein GitHub- oder E-Mail-Konto für Supabase.
 
+> **Gemeinsames Konto (seit November 2026):** Dieses Projekt teilen sich Taktwerk, die Haushalt-App und später das
+> Kochbuch. Anmeldecode, Adressen der Website, Zugang nur für freigeschaltete Adressen und die Tabellen der
+> Haushalt-App stehen in [`../../konten/README.md`](../../konten/README.md); dort gilt, was von den Abschnitten 3.2,
+> 3.3 und 4 hier abweicht.
+
 | Datei | Zweck |
 |---|---|
 | [`schema.sql`](schema.sql) | Tabellen, Trigger, Rechte und Realtime – im SQL-Editor ausführen |
@@ -92,17 +97,18 @@ In der App: E-Mail-Adresse eingeben → «Code senden» → 6-stelligen Code ein
 Technisch: `supabase.auth.signInWithOtp({ email })` und danach
 `supabase.auth.verifyOtp({ email, token, type: 'email' })`.
 
-> **Tipp:** Wenn du dich auf allen Geräten angemeldet hast, kannst du **Allow new users to sign up**
-> ausschalten. Dann kann niemand sonst ein Konto in deinem Projekt anlegen. Deine eigene Anmeldung
-> per Code funktioniert weiterhin.
+> **Tipp:** Statt **Allow new users to sign up** auszuschalten, regelt im gemeinsamen Projekt eine Liste, welche
+> Adressen ein Konto anlegen dürfen ([`../../konten/README.md`](../../konten/README.md), Schritt 4). So kann die
+> Partnerin für die Haushalt-App ein Konto anlegen, sonst niemand.
 
 ## 4. Site-URL und Redirect-URLs
 
 **Authentication → URL Configuration**
 
-- **Site URL:** `https://simonbruder-hub.github.io/apps/taktwerk/app/`
+- **Site URL:** `https://simonbruder-hub.github.io/apps/` (Startseite aller Apps)
 - **Redirect URLs** (mit «Add URL»):
-  - `https://simonbruder-hub.github.io/apps/taktwerk/**`
+  - `https://simonbruder-hub.github.io/apps/**`
+  - `https://simonbruder-hub.github.io/haushaltskasse-app/**` (Haushalt-App, gleiches Konto)
   - für die Entwicklung zusätzlich `http://localhost:5173/**` (Vite) und `http://localhost:4173/**` (Vorschau)
 
 Mit Codes werden diese Adressen kaum gebraucht. Supabase lehnt aber Anfragen ab, deren

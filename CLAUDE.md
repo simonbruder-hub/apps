@@ -14,6 +14,7 @@ Diese Datei lädt in jedem Chat automatisch. Kurz halten, nur Orientierung.
 | `lernlabor/` | Elektrotechnik-Lernapp; vorerst stillgelegt, soll in den Study Hub (Repo `study-hub`) umziehen | `lernlabor/README.md` |
 | `vorlage/` | Leere App mit Beispiel und Tests, Ausgangspunkt für neue Apps (nicht veröffentlicht) | `vorlage/README.md` |
 | `gemeinsam/` | Gemeinsames Aussehen: `basis.css` mit Schriften, Farben, Bausteinen; jede App setzt nur ihre Akzentfarbe | `gemeinsam/README.md` |
+| `konten/` | Gemeinsames Supabase-Konto (Projekt von Taktwerk, auch Haushalt): Anleitung fürs Dashboard, SQL für den Zugang | `konten/README.md` |
 
 Die Haushalt-App ist nur auf der Startseite verlinkt, sie liegt im eigenen Repo `haushaltskasse-app`.
 `apps.json` listet alle Apps; CI und Pages bauen daraus. Neue App: `vorlage/README.md`.
@@ -39,7 +40,7 @@ npm ci
 npm run typecheck && npm test
 npm run build
 PW_CHROMIUM=/opt/pw-browsers/chromium npm run test:e2e
-npm run db:test        # nur taktwerk, braucht PostgreSQL 16
+npm run db:test        # nur taktwerk, braucht PostgreSQL 16; prüft auch konten/zugang.sql
 npm run build:single   # nur taktwerk
 node scripts/apps.mjs pruefen   # im Repo-Ordner: apps.json, Ordner und Karten der Startseite
 ```

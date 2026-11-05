@@ -20,5 +20,6 @@ Apps aus anderen Repos liegen in `img/`.
 | `apps.json` | Liste aller Apps. CI und GitHub Pages bauen daraus, `node scripts/apps.mjs pruefen` prüft Ordner und Karten der Startseite |
 | [`gemeinsam/`](gemeinsam/) | Gemeinsames Aussehen: Schriften, Farben hell und dunkel, Knöpfe, Felder, Karten; jede App setzt nur ihre Akzentfarbe |
 | [`vorlage/`](vorlage/) | Leere App mit Beispiel und Tests; Anleitung für eine neue App im README dort |
+| [`konten/`](konten/) | Gemeinsames Supabase-Konto für Taktwerk, Haushalt und später Kochbuch: Anleitung und SQL für den Zugang |
 | `index.html` | Startseite mit einer Karte pro App |
 | `docs/AUFGABEN.md` | Aufgaben und Entscheide |
