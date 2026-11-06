@@ -5,7 +5,8 @@
 #   bash supabase/test/run.sh        (oder: npm run db:test)
 #
 # Ablauf: temporären Cluster anlegen (nur Unix-Socket, kein TCP) → stubs.sql
-# (Supabase-Nachbildung) → schema.sql ZWEIMAL (Idempotenz) → tests.sql.
+# (Supabase-Nachbildung) → schema.sql ZWEIMAL (Idempotenz) → tests.sql, danach
+# ../../konten/zugang.sql ZWEIMAL → ../../konten/test.sql (gemeinsames Projekt).
 # Der Cluster wird am Ende in jedem Fall gestoppt und gelöscht.
 #
 # Umgebungsvariablen (optional):
@@ -110,5 +111,11 @@ run_setup "Supabase-Nachbildung laden (stubs.sql)" "$HERE/stubs.sql"
 run_setup "Schema laden (schema.sql, 1. Durchlauf)" "$SUPABASE_DIR/schema.sql" --single-transaction
 run_setup "Schema erneut laden (schema.sql, 2. Durchlauf – Idempotenz)" "$SUPABASE_DIR/schema.sql" --single-transaction
 run_tests "Tests ausführen (tests.sql)" "$HERE/tests.sql"
+
+# Gemeinsames Projekt der Apps: Zugang nur für freigeschaltete Adressen (läuft dort nach schema.sql)
+KONTEN_DIR="$(cd "$SUPABASE_DIR/../../konten" && pwd)"
+run_setup "Zugang laden (konten/zugang.sql, 1. Durchlauf)" "$KONTEN_DIR/zugang.sql" --single-transaction
+run_setup "Zugang erneut laden (konten/zugang.sql, 2. Durchlauf, Idempotenz)" "$KONTEN_DIR/zugang.sql" --single-transaction
+run_tests "Tests ausführen (konten/test.sql)" "$KONTEN_DIR/test.sql"
 
 echo "✔ Datenbank-Tests erfolgreich"

@@ -18,7 +18,7 @@ in Kürze stehen in `CLAUDE.md` (lädt automatisch); `taktwerk/docs/STATUS.md` n
 - Handy: Android, daneben auch iPhone.
 - Die Desktop-App soll lokal ohne Internet laufen, Sync, sobald Netz da ist.
 - Anmeldung: Supabase schickt nur einen Link (Vorlage noch ohne `{{ .Token }}`), der Link endet auf einer
-  Seite mit Fehler 404 (Site-URL). Eigenes Supabase-Projekt ist eingerichtet.
+  Seite mit Fehler 404 (Site-URL). Eigenes Supabase-Projekt ist eingerichtet. Lösung: `konten/README.md`, Schritte 2 und 3.
 - Widget bis Desktop-App 1.0.3: normales Fenster mit Rahmen, oben und unten zu viel Platz, viel zu gross,
   lässt sich nur begrenzt verkleinern (Mindestgrösse 360 × 560), muss jedes Mal von Hand angepasst werden.
   Mit 1.1 gelöst (eigenes Widget-Fenster, siehe Aufgabe 2).
@@ -50,6 +50,12 @@ in Kürze stehen in `CLAUDE.md` (lädt automatisch); `taktwerk/docs/STATUS.md` n
   nur mit eigener Akzentfarbe, in jeder App «Alle Apps». Taktwerk behält seine 17 Stile. Neue Apps aus `vorlage/`, alle
   Apps in `apps.json`, danach bauen CI und Pages. Apps aus anderen Repos (Haushalt, später Bachelorarbeit) bleiben
   verlinkt. Konten: privat zusammen, der Study Hub getrennt (Aufgabe 7).
+- Gemeinsame Konten (05.11.2026, Aufgabe 7): Das Supabase-Projekt von Taktwerk wird das gemeinsame Konto für Taktwerk,
+  Haushalt und später Kochbuch; das bisherige Haushalt-Projekt hatte keine echten Daten und geht an den Study Hub.
+  Die Tabellen der Haushalt-App kommen ohne eigenes Schema nach `public` (keine gleichen Namen; zusammen in einer
+  Testdatenbank laufen alle Prüfungen). Konten nur für Adressen auf einer Liste im Projekt (`konten/zugang.sql`, Hook
+  «Before User Created»), die Adressen nie im Repo. Die Haushalt-App verbindet sich auf der Website von selbst. Ein
+  gemeinsames Modul `konto.ts` braucht es nicht: gleiche Projekt-Adresse heisst eine Sitzung für alle Apps im Browser.
 - Study Hub (28.10.2026): vernetztes Formelbuch mit Simulationen und Lernhilfen als eigenes, öffentliches Projekt im
   Repo `simonbruder-hub/study-hub` (Briefing, Entscheide und Aufgaben dort). Das Lernlabor zieht dorthin um.
 - Bachelorarbeit: eigenes Repo und eigene Chats. Später App und Website dazu, jetzt nichts veröffentlichen,
@@ -98,23 +104,12 @@ in Kürze stehen in `CLAUDE.md` (lädt automatisch); `taktwerk/docs/STATUS.md` n
 
 6. **Study Hub** (eigenes Repo `simonbruder-hub/study-hub`, Startsatz dort). Hier betrifft es nur den Umzug des
    Lernlabors: Startseite, Links in Taktwerk und eine Weiterleitung auf die neue Adresse, sobald es dort läuft.
-7. **Gemeinsame Konten** (Plan; Entscheid 05.11.2026: privat zusammen). Eine Anmeldung für Taktwerk, Haushalt und
-   später Kochbuch. Der Study Hub mit Konten anderer Studierender bleibt getrennt im zweiten Supabase-Projekt
-   (Free-Plan: 2 aktive Projekte pro Konto; heute haben Taktwerk und Haushalt je eines).
-   - Zuerst mit Simon im Supabase-Dashboard klären, welche Projekte es gibt und wo welche Daten liegen. Vorschlag: das
-     Projekt von Taktwerk wird das gemeinsame (seine Adresse steckt in Website und Desktop-App, kein neues Release
-     nötig), der Haushalt zieht dorthin um, das frei werdende Projekt bekommt der Study Hub.
-   - Jede App mit eigenem Schema und Row Level Security wie bisher: Taktwerk bleibt in `public`, dazu `haushalt`, später
-     `kochbuch`; neue Schemas in Supabase unter «Exposed schemas» freigeben.
-   - Eine Sitzung für alle: die Apps liegen auf `simonbruder-hub.github.io` und teilen den Browser-Speicher. Mit
-     derselben Projekt-URL und demselben `storageKey` reicht eine Anmeldung. Gemeinsames Modul `gemeinsam/konto.ts`
-     (nur supabase-js, ohne Preact oder React); der Haushalt übernimmt es als Kopie in sein Repo.
-   - Anmeldung mit Code aus der Mail statt Link (Mailvorlage mit `{{ .Token }}`, löst den 404-Link), Site URL
-     `https://simonbruder-hub.github.io/apps/`, Redirect URLs aller Apps. Neue Konten nur für eigene Adressen.
-   - Daten des Haushalts umziehen (vorher sichern; Export und Import oder neu hochladen von den Handys), dann das alte
-     Projekt löschen. Im Repo `study-hub` vermerken, dass er das frei werdende Projekt bekommt.
-   - Danach: Kochbuch über das Konto synchronisieren (STATUS.md, Offen 10). Pages gibt die Supabase-Verbindung schon
-     allen Apps mit (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` in `pages.yml`).
+7. **Gemeinsame Konten** (Code und Anleitung erledigt: PR `simonbruder-hub/apps#16` und
+   `simonbruder-hub/haushaltskasse-app#1`, siehe Entscheide). Offen bei Simon, Schritt für Schritt in
+   `konten/README.md`: im Dashboard Anmeldecode, Adressen der Website, Liste der Adressen mit Hook, Tabellen der
+   Haushalt-App; dann den Haushalt auf dem Handy verbinden, die Partnerin einladen, das alte Haushalt-Projekt löschen.
+   Danach im Repo `study-hub` vermerken, dass er das frei werdende Projekt bekommt, und das Kochbuch über das Konto
+   synchronisieren (STATUS.md, Offen 10).
 
 ## Später
 
@@ -134,7 +129,8 @@ in Kürze stehen in `CLAUDE.md` (lädt automatisch); `taktwerk/docs/STATUS.md` n
 - In jedem App-Ordner aus `apps.json` (`taktwerk/`, `lernlabor/`, `kochbuch/`, `lohn/`, `vorlage/`): `npm run typecheck`,
   `npm test`, `npm run build`, `npm run test:e2e`; in `taktwerk/` dazu `npm run build:single`. Im Repo-Ordner
   `node scripts/apps.mjs pruefen` (Liste, Ordner, Karten der Startseite). CI: ein Job pro App aus der Liste, Taktwerk
-  mit eigenem Job.
+  mit eigenem Job. `npm run db:test` in `taktwerk/` prüft auch `konten/zugang.sql` (Zugang des gemeinsamen
+  Projekts).
 - Aussehen: `gemeinsam/basis.css` gilt für Startseite, Kochbuch, Lohnrechner und Vorlage. Nach Änderungen dort alle
   vier ansehen (hell, dunkel, 360 px breit) und ihre Tests laufen lassen.
 - Playwright in der Cloud: Chromium unter `/opt/pw-browsers/chromium`. Lokale Config mit

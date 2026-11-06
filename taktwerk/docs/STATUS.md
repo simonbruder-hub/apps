@@ -107,6 +107,11 @@ die App unter `https://simonbruder-hub.github.io/apps/taktwerk/app/`.
   Kochbuch, Lohnrechner und die neue Vorlage `../../vorlage/`; Liste `../../apps.json`, CI mit einem Job pro App.
   Taktwerk behält seine Stile und bekommt «Alle Apps» oben rechts (ab 521 px Breite; schmaler in den Einstellungen),
   nicht in Desktop-App und Einzeldatei (`src/app/alleApps.ts`).
+- **Gemeinsames Konto** (Aufgabe 7, PR `simonbruder-hub/apps#16`): Das Supabase-Projekt von Taktwerk ist jetzt auch
+  das Konto der Haushalt-App (und später des Kochbuchs). Am Code von Taktwerk ändert sich nichts, auch kein neues
+  Desktop-Release. Neu: `../../konten/zugang.sql` (Konten nur für freigeschaltete Adressen, Hook «Before User
+  Created»), geprüft mit `npm run db:test`; Anleitung `../../konten/README.md`. Im selben Browser teilen Taktwerk und
+  Haushalt die Anmeldung.
 
 ## Offen
 
@@ -120,8 +125,8 @@ die App unter `https://simonbruder-hub.github.io/apps/taktwerk/app/`.
 3. **Lernlabor ausbauen** (zieht in den Study Hub um, Repo `simonbruder-hub/study-hub`; nächste Schritte in `docs/LERNAPP.md`): Diode, Transistor, OP; mehr Aufgaben;
    Fächer Elektromagnetismus, Physik, Chemie, Mathematik in Stufen.
 4. Optional: eigener Superhelden-Stil (eigene Figur).
-5. Gemeinsame Konten für Taktwerk, Haushalt und Kochbuch, online und offline auf allen Geräten: Plan in
-   `../../docs/AUFGABEN.md`, Aufgabe 7.
+5. Gemeinsame Konten: Einrichtung im Dashboard nach `../../konten/README.md` (bei Simon), danach das Kochbuch
+   über das Konto synchronisieren (Punkt 10).
 6. Bekannt: der E2E-Test «läuft nach dem Neuladen an der richtigen Stelle weiter» schlägt lokal im Profil «mobile» fehl
    (auch ohne die neuen Änderungen), in CI prüfen.
 7. Dschungelschlange optional ebenfalls in 3D.

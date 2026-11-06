@@ -1,7 +1,8 @@
 -- =============================================================================
 -- Minimale Supabase-Nachbildung für den lokalen Schematest (nur für run.sh).
 -- Stellt bereit, was schema.sql von Supabase erwartet:
---   - Rollen anon, authenticated, service_role (service_role umgeht RLS)
+--   - Rollen anon, authenticated, service_role (service_role umgeht RLS) und
+--     supabase_auth_admin (ruft den Auth Hook aus konten/zugang.sql auf)
 --   - Schema auth mit auth.users(id) und auth.uid() (liest die JWT-Claims wie
 --     PostgREST: request.jwt.claim.sub oder request.jwt.claims ->> 'sub')
 --   - leere Publication supabase_realtime
@@ -19,6 +20,10 @@ begin
   end if;
   if not exists (select 1 from pg_roles where rolname = 'service_role') then
     create role service_role nologin noinherit bypassrls;
+  end if;
+  -- Anmeldedienst von Supabase (ruft Auth Hooks auf, konten/zugang.sql)
+  if not exists (select 1 from pg_roles where rolname = 'supabase_auth_admin') then
+    create role supabase_auth_admin nologin noinherit;
   end if;
 end
 $$;
