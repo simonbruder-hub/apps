@@ -5,6 +5,7 @@
  */
 import type { Kochbuch, Rezept } from '../data/types';
 import { mengeText, zahlText } from './mengen';
+import { anzahl } from './text';
 
 export interface ZettelEintrag {
   id: string;
@@ -54,8 +55,7 @@ export const proStueck = (r: Rezept) => r.art === 'Gebäck';
 
 export function portionText(r: Rezept, faktor: number, personen: number): string {
   if (proStueck(r)) return `× ${zahlText(faktor)}`;
-  const n = Math.round(faktor * personen);
-  return `${n} ${n === 1 ? 'Person' : 'Personen'}`;
+  return anzahl(Math.round(faktor * personen), 'Person', 'Personen');
 }
 
 /** Erlaubte Schritte: eine Person mehr oder weniger (bis 12), bei Gebäck halbe Mengen bis ×4 */

@@ -2,7 +2,7 @@
  * Prüft eine eingelesene rezepte.json und bringt sie in eine feste Form.
  * Pflicht sind nur id, Titel und Zutaten; fehlende Zusatzfelder werden zu null.
  */
-import type { EinkaufPosten, Jahreszeit, Kochbuch, MagenStufe, Rezept, Zutat } from './types';
+import type { Bestand, EinkaufPosten, Jahreszeit, Kochbuch, MagenStufe, Rezept, Zutat } from './types';
 
 export const JAHRESZEITEN: Jahreszeit[] = ['fruehling', 'sommer', 'herbst', 'winter'];
 export const MAGEN: MagenStufe[] = ['gut', 'anpassung', 'meiden'];
@@ -96,4 +96,16 @@ export function pruefeKochbuch(roh: unknown): Kochbuch {
     werte: { art: textListe(werte.art, ARTEN), ernaehrung: textListe(werte.ernaehrung, ERNAEHRUNG) },
     rezepte,
   };
+}
+
+/**
+ * Prüft den gespeicherten Stand beim Start nochmals. Er kann von einer älteren Version der App stammen oder
+ * beschädigt sein; die Rezepte laufen darum durch dieselbe Prüfung wie beim Import.
+ */
+export function pruefeBestand(roh: unknown): Bestand {
+  if (!istObj(roh)) throw new DatenFehler('Der gespeicherte Stand ist unlesbar.');
+  const datei = textOder(roh.datei);
+  const geladen = textOder(roh.geladen);
+  if (!datei || !geladen || Number.isNaN(Date.parse(geladen))) throw new DatenFehler('Der gespeicherte Stand ist unvollständig.');
+  return { kochbuch: pruefeKochbuch(roh.kochbuch), datei, geladen };
 }

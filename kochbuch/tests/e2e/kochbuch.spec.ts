@@ -164,3 +164,53 @@ test('teilt den Zettel als Text', async ({ page }) => {
   expect(text).toContain('- Äpfel (6)');
   expect(text).toContain('- Milch (3 dl)');
 });
+
+test('zeigt bei einer kaputten Adresse einen Hinweis statt einer leeren Seite', async ({ page }) => {
+  await laden(page);
+  await page.goto('./#/rezept/%E0');
+  await page.reload();
+  await expect(page.getByText('Dieses Rezept ist in den geladenen Daten nicht enthalten.')).toBeVisible();
+  await page.getByRole('link', { name: 'Zu allen Rezepten' }).click();
+  await expect(page.locator('.treffer')).toHaveText('6 Rezepte');
+});
+
+test('fängt einen Fehler beim Zeichnen ab, die Navigation bleibt', async ({ page }) => {
+  await laden(page);
+  // simuliert einen unerwarteten Fehler auf der Seite «Daten», sie schreibt das Ladedatum mit toLocaleString
+  await page.evaluate(() => { Date.prototype.toLocaleString = () => { throw new Error('Testfehler'); }; });
+  await page.getByRole('link', { name: 'Daten' }).click();
+  await expect(page.getByRole('alert')).toContainText('Diese Seite liess sich nicht anzeigen');
+  await page.getByRole('link', { name: 'Rezepte', exact: true }).click();
+  await expect(page.locator('.treffer')).toHaveText('6 Rezepte');
+});
+
+test('meldet unlesbare gespeicherte Rezepte und lädt sie neu', async ({ page }) => {
+  await page.goto('./');
+  await expect(page.getByRole('heading', { name: 'Rezepte auf dieses Gerät laden' })).toBeVisible();
+  // so sähe ein Stand aus einer älteren oder beschädigten Version aus
+  await page.evaluate(() => new Promise<void>((ok, fehler) => {
+    const r = indexedDB.open('kochbuch', 1);
+    r.onsuccess = () => {
+      const t = r.result.transaction('kv', 'readwrite');
+      t.objectStore('kv').put({ kochbuch: { rezepte: 'kaputt' }, datei: 'alt.json', geladen: '2026-01-01T00:00:00.000Z' }, 'bestand');
+      t.oncomplete = () => { r.result.close(); ok(); };
+      t.onerror = () => fehler(t.error);
+    };
+    r.onerror = () => fehler(r.error);
+  }));
+  await page.reload();
+  await expect(page.getByRole('alert')).toContainText('liessen sich nicht lesen');
+  await page.locator('input[type=file]').setInputFiles(JSON_DATEI);
+  await expect(page.locator('.treffer')).toHaveText('6 Rezepte');
+  await expect(page.getByRole('alert')).toHaveCount(0);
+});
+
+test('meldet, wenn das Entfernen nicht klappt, und behält die Rezepte', async ({ page }) => {
+  await laden(page);
+  await page.getByRole('link', { name: 'Daten' }).click();
+  await page.evaluate(() => { IDBObjectStore.prototype.delete = () => { throw new DOMException('Testfehler', 'UnknownError'); }; });
+  page.once('dialog', d => void d.accept());
+  await page.getByRole('button', { name: 'Rezepte von diesem Gerät entfernen' }).click();
+  await expect(page.getByRole('alert')).toContainText('liessen sich nicht entfernen');
+  await expect(page.getByText('6 Rezepte aus «testkochbuch.json»')).toBeVisible();
+});

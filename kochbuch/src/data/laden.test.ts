@@ -1,7 +1,7 @@
 import { crc32, deflateRawSync } from 'node:zlib';
-import { fixtureText } from '../test/fixture';
-import { ladeDaten } from './laden';
-import { DatenFehler } from './pruefen';
+import { fixtureText, testbuch } from '../test/fixture';
+import { ladeDaten, ladeDatei, MAX_BYTES } from './laden';
+import { DatenFehler, pruefeBestand } from './pruefen';
 
 const puffer = (b: Buffer) => b.buffer.slice(b.byteOffset, b.byteOffset + b.length) as ArrayBuffer;
 
@@ -94,5 +94,25 @@ describe('Rezepte laden', () => {
     expect(await fehler('{"rezepte": [{"id": "a", "titel": "A", "zutaten": []}, {"id": "a", "titel": "B", "zutaten": []}]}')).toMatch(/mehrfach/);
     const kaputt = new Uint8Array(zip([{ name: 'rezepte.json', text: fixtureText(), packen: true }])).slice(0, 200);
     await expect(ladeDaten(kaputt.buffer)).rejects.toThrow(/ZIP/);
+  });
+
+  it('weist eine zu grosse Datei ab, ohne sie einzulesen', async () => {
+    const riesig = { size: MAX_BYTES + 1, arrayBuffer: () => { throw new Error('darf nicht gelesen werden'); } } as unknown as Blob;
+    await expect(ladeDatei(riesig)).rejects.toThrow(/zu gross/);
+  });
+});
+
+describe('Gespeicherter Stand', () => {
+  const stand = () => ({ kochbuch: testbuch(), datei: 'rezepte.json', geladen: '2026-11-01T10:00:00.000Z' });
+
+  it('übernimmt einen gültigen Stand unverändert', () => {
+    expect(pruefeBestand(stand())).toEqual(stand());
+  });
+
+  it('weist einen veralteten oder beschädigten Stand ab', () => {
+    expect(() => pruefeBestand(null)).toThrow(DatenFehler);
+    expect(() => pruefeBestand({ ...stand(), kochbuch: { rezepte: 'kaputt' } })).toThrow(DatenFehler);
+    expect(() => pruefeBestand({ ...stand(), geladen: 'gestern' })).toThrow(DatenFehler);
+    expect(() => pruefeBestand({ ...stand(), datei: undefined })).toThrow(DatenFehler);
   });
 });

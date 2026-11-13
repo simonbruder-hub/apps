@@ -1,7 +1,8 @@
 /** Datei wählen oder hineinziehen: rezepte.json oder das ZIP «rezepte-json» aus GitHub Actions */
 import { useState } from 'preact/hooks';
 import { DatenFehler } from '../data/pruefen';
-import { importiere } from '../state';
+import { anzahl } from '../logic/text';
+import { bestandUnlesbar, importiere } from '../state';
 import { toast } from '../ui/toast';
 
 export function Import({ erneut = false }: { erneut?: boolean }) {
@@ -15,7 +16,7 @@ export function Import({ erneut = false }: { erneut?: boolean }) {
     setFehler(null);
     try {
       const b = await importiere(datei);
-      toast(`${b.rezepte.length} Rezepte geladen`);
+      toast(`${anzahl(b.rezepte.length, 'Rezept', 'Rezepte')} geladen`);
     } catch (e) {
       setFehler(e instanceof DatenFehler ? e.message : 'Die Datei liess sich nicht lesen oder nicht speichern.');
     } finally {
@@ -59,6 +60,12 @@ export function WoherDatei() {
   );
 }
 
+/** Beim Start liessen sich die gespeicherten Rezepte nicht lesen */
+export function UnlesbarHinweis() {
+  if (!bestandUnlesbar.value) return null;
+  return <p class="panel-note is-bad" role="alert">Die gespeicherten Rezepte liessen sich nicht lesen (ältere Version der App oder beschädigt). Lade die Datei bitte neu.</p>;
+}
+
 /** Erster Start: noch keine Rezepte auf diesem Gerät */
 export function Willkommen() {
   return (
@@ -69,6 +76,7 @@ export function Willkommen() {
       </section>
       <section class="card">
         <h2>Rezepte auf dieses Gerät laden</h2>
+        <UnlesbarHinweis />
         <p>Die Rezepte stehen nicht auf der Website. Du lädst sie einmal pro Gerät, danach bleiben sie nur in diesem Browser und die App läuft auch offline.</p>
         <Import />
       </section>
