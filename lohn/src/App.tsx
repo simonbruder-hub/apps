@@ -2,7 +2,7 @@
  * Lohnrechner auf einer Seite: Eingaben links, Ergebnis, Nettolohn und Verdienst rechts (auf dem Handy untereinander).
  * Jede Änderung rechnet sofort neu und landet im Speicher des Browsers.
  */
-import { useEffect, useState } from 'preact/hooks';
+import { useLayoutEffect, useState } from 'preact/hooks';
 import { abzuege, type Feld, feld, type Formular, lesen, START } from './logic/formular';
 import { type Eingaben, type Ergebnis, rechne, verdienst } from './logic/lohn';
 import { type Abzuege, abziehen, type Netto, nettolohn } from './logic/netto';
@@ -16,7 +16,8 @@ const tage = (n: number) => `${anzahl(n)} ${n === 1 ? 'Tag' : 'Tage'}`;
 
 export function App() {
   const [f, setF] = useState<Formular>(laden);
-  useEffect(() => speichern(f), [f]);
+  // Gleich nach dem Zeichnen speichern, nicht erst im nächsten Frame: sonst fehlt nach sofortigem Neuladen die letzte Eingabe
+  useLayoutEffect(() => speichern(f), [f]);
   const setze: Setze = (k, v) => setF(alt => ({ ...alt, [k]: v }));
   const { eingaben, fehler } = lesen(f);
   const { abzuege: a, fehler: abzugFehler } = abzuege(f);
