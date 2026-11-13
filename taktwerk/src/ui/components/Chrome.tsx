@@ -61,7 +61,7 @@ export function SyncIndicator() {
   if (st.lastSyncedAt) parts.push(`Zuletzt synchronisiert ${fmtAgo(st.lastSyncedAt)}`);
   if (st.pending) parts.push(`${st.pending} Änderung${st.pending === 1 ? '' : 'en'} noch nicht übertragen`);
   if (st.error) parts.push(st.error);
-  if (!backend) parts.push('Daten liegen nur auf diesem Gerät – Sync in den Einstellungen einrichten');
+  if (!backend) parts.push('Daten liegen nur auf diesem Gerät. Sync in den Einstellungen einrichten');
   const icon = st.state === 'offline' || st.state === 'signed_out' ? 'cloud-off' : st.state === 'syncing' ? 'sync' : st.state === 'error' ? 'warn' : 'cloud';
   return (
     <button type="button" class="sync" data-state={st.state} title={parts.join('\n')} aria-label={parts.join('. ')} onClick={() => go('einstellungen', 'sync')}>

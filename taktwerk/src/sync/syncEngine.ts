@@ -83,10 +83,10 @@ const MAX_CODE_LENGTH = 32;
 export const SYNC_USER_KEY = 'sync_user_id';
 
 const MSG = {
-  offline: 'Offline – Änderungen sind lokal gespeichert.',
-  unreachable: 'Server nicht erreichbar – Änderungen sind lokal gespeichert.',
-  signedOut: 'Bitte erneut anmelden – Änderungen sind lokal gespeichert.',
-  otherAccount: 'Die lokalen Daten gehören zu einem anderen Konto – bitte mit jenem Konto anmelden oder die lokalen Daten zurücksetzen.',
+  offline: 'Offline. Änderungen sind lokal gespeichert.',
+  unreachable: 'Server nicht erreichbar. Änderungen sind lokal gespeichert.',
+  signedOut: 'Bitte erneut anmelden. Änderungen sind lokal gespeichert.',
+  otherAccount: 'Die lokalen Daten gehören zu einem anderen Konto. Bitte mit jenem Konto anmelden oder die lokalen Daten zurücksetzen.',
 } as const;
 
 const ROW_LABEL: Record<EntityTable, string> = {

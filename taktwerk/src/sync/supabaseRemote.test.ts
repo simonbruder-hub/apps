@@ -5,8 +5,8 @@ import { MemoryServer } from './memoryRemote';
 import { RemoteError } from './remote';
 import type { Timers } from './runtime';
 import {
-  SupabaseRemote, fromRemoteRow, keysetFilter, mapPostgrestError, settingsFromRemote, settingsToRemote,
-  timerFromRemote, timerToRemote, toRemoteRow, type PostgrestErrorLike,
+  SupabaseRemote, createSupabaseClient, fromRemoteRow, keysetFilter, mapPostgrestError, settingsFromRemote,
+  settingsToRemote, signOut, timerFromRemote, timerToRemote, toRemoteRow, type PostgrestErrorLike,
 } from './supabaseRemote';
 import { SyncEngine } from './syncEngine';
 import { createTestDevice, projectInput, remoteProject } from './testing';
@@ -393,5 +393,19 @@ describe('SupabaseRemote', () => {
     const upsert = queries[queries.length - 1]!.arg('upsert')!;
     expect(upsert[0]).toEqual({ status: 'running', updated_at: ISO, user_id: 'u1' });
     expect(upsert[1]).toEqual({ onConflict: 'user_id' });
+  });
+});
+
+describe('Anmeldung', () => {
+  it('meldet beim Abmelden nur dieses Gerät ab, nicht alle Geräte des Kontos', async () => {
+    const abmelden = vi.fn().mockResolvedValue({ error: null });
+    await signOut({ auth: { signOut: abmelden } } as unknown as SupabaseClient);
+    expect(abmelden).toHaveBeenCalledWith({ scope: 'local' });
+  });
+
+  it('übernimmt keine Sitzung aus einem Link in der Adresse, angemeldet wird nur mit Code', async () => {
+    const client = createSupabaseClient('https://beispiel.supabase.co', 'anon-key-nur-fuer-den-test');
+    expect((client.auth as unknown as { detectSessionInUrl: boolean }).detectSessionInUrl).toBe(false);
+    await client.auth.stopAutoRefresh();
   });
 });
