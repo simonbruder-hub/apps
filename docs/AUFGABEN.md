@@ -110,6 +110,9 @@ in Kürze stehen in `CLAUDE.md` (lädt automatisch); `taktwerk/docs/STATUS.md` n
    Haushalt-App; dann den Haushalt auf dem Handy verbinden, die Partnerin einladen, das alte Haushalt-Projekt löschen.
    Danach im Repo `study-hub` vermerken, dass er das frei werdende Projekt bekommt, und das Kochbuch über das Konto
    synchronisieren (STATUS.md, Offen 10).
+8. **Code-Audit pro App** (Prüfliste: Architektur, Stabilität, Performance, Sicherheit, Texte; Funde nach
+   KRITISCH, WICHTIG, OPTIONAL, die ersten beiden direkt beheben). Erledigt: Kochbuch (PR `simonbruder-hub/apps#17`,
+   die optionalen Funde stehen dort). Offen: Lohnrechner, Taktwerk in Teilen, Haushalt; eine App pro Chat.
 
 ## Später
 

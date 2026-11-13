@@ -42,4 +42,11 @@ describe('Mengen', () => {
     expect(skaliereText('Salz, Pfeffer', 3)).toBe('Salz, Pfeffer');
     expect(skaliereText('1 Zwiebel', 1)).toBe('1 Zwiebel');
   });
+
+  it('lässt Anteile und Temperaturen beim Umrechnen stehen', () => {
+    expect(skaliereText('200 g dunkle Schokolade (70 %)', 1.5)).toBe('300 g dunkle Schokolade (70 %)');
+    expect(skaliereText('2 dl Vollrahm, 35%', 2)).toBe('4 dl Vollrahm, 35%');
+    expect(skaliereText('1 l Milch (3,5 %)', 2)).toBe('2 l Milch (3,5 %)');
+    expect(skaliereText('50 g Butter (20 °C)', 2)).toBe('100 g Butter (20 °C)');
+  });
 });

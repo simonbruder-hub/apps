@@ -6,6 +6,7 @@ import { useState } from 'preact/hooks';
 import type { Kochbuch } from '../data/types';
 import { LEERER_ZETTEL, posten, postenText, vomZettel, waehle, zettelText, aufZettel } from '../logic/einkauf';
 import { anKasseSenden, type KasseErgebnis, KasseFehlt, kasseListeUrl } from '../logic/kasse';
+import { anzahl } from '../logic/text';
 import { href } from '../router';
 import { buch, zettel } from '../state';
 import { Portionen } from '../ui/bits';
@@ -42,10 +43,11 @@ function Zettel({ b }: { b: Kochbuch }) {
       const ergebnis = await anKasseSenden(zuKaufen.map(p => ({ name: p.name, text: postenText(p) })));
       setSenden({ ok: ergebnis });
     } catch (e) {
+      if (!(e instanceof KasseFehlt)) console.error('Senden an Kasse unterwegs', e);
       setSenden({
         fehler: e instanceof KasseFehlt
           ? 'Kasse unterwegs ist in diesem Browser noch nicht eingerichtet. Öffne sie einmal hier (gleiches Gerät, gleicher Browser) und sende dann nochmals.'
-          : `Senden hat nicht geklappt${e instanceof Error && e.message ? ` (${e.message})` : ''}.`,
+          : 'Senden hat nicht geklappt. Schliesse Kasse unterwegs ganz und versuche es nochmals.',
       });
     }
   }
@@ -121,7 +123,7 @@ function Zettel({ b }: { b: Kochbuch }) {
           <div class="panel-note frage" role="alertdialog" aria-label="Senden bestätigen">
             <p><b>Ist Kasse unterwegs geschlossen?</b> Läuft sie noch im Hintergrund, überschreibt sie die neuen Einträge. Auf dem Handy die App aus den zuletzt benutzten Apps wegwischen.</p>
             <div class="aktionen">
-              <button type="button" class="btn btn-primary" onClick={() => void jetztSenden()}>Ja, {zuKaufen.length} Zutaten senden</button>
+              <button type="button" class="btn btn-primary" onClick={() => void jetztSenden()}>Ja, {anzahl(zuKaufen.length, 'Zutat', 'Zutaten')} senden</button>
               <button type="button" class="btn" onClick={() => setSenden(null)}>Abbrechen</button>
             </div>
           </div>
@@ -130,7 +132,7 @@ function Zettel({ b }: { b: Kochbuch }) {
         {senden && typeof senden === 'object' && 'ok' in senden && (
           <div class="panel-note is-good" role="status">
             <p>
-              {senden.ok.neu === 1 ? '1 Zutat' : `${senden.ok.neu} Zutaten`} an Kasse unterwegs gesendet.
+              {anzahl(senden.ok.neu, 'Zutat', 'Zutaten')} an Kasse unterwegs gesendet.
               {senden.ok.schon.length > 0 && ` Schon auf der Liste: ${senden.ok.schon.join(', ')}.`}
             </p>
             <div class="aktionen">

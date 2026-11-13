@@ -59,13 +59,18 @@ export function zahlWert(s: string): number {
   return Number(t.replace(',', '.'));
 }
 
+/** Zeichen direkt nach einer Zahl für einen Anteil oder eine Temperatur: Die gelten für jede Menge */
+const ANTEIL = /^[%‰°]/;
+
 /**
  * Rechnet alle Zahlen einer Zutatenzeile um: «1 Kürbis (ca. 500 g)» mal 1,5 gibt «1½ Kürbis (ca. 750 g)».
  * Bereiche bleiben Bereiche (1 bis 2 TL), gerundet wird passend zur Einheit nach der Zahl.
+ * Anteile und Temperaturen bleiben stehen: «Schokolade (70 %)», «Butter (20 °C)».
  */
 export function skaliereText(text: string, faktor: number): string {
   if (Math.abs(faktor - 1) < 1e-9) return text;
-  return text.replace(MUSTER, (_alles, a: string, trenner: string | undefined, b: string | undefined, luecke: string, wort: string | undefined) => {
+  return text.replace(MUSTER, (alles: string, a: string, trenner: string | undefined, b: string | undefined, luecke: string, wort: string | undefined, stelle: number) => {
+    if (!wort && ANTEIL.test(text.slice(stelle + alles.length))) return alles;
     const einheit = wort && EINHEITEN.has(wort.toLowerCase()) ? wort : null;
     const neu = (s: string) => zahlText(runde(zahlWert(s) * faktor, einheit), einheit);
     return neu(a) + (b !== undefined ? `${trenner ?? ''}${neu(b)}` : '') + luecke + (wort ?? '');

@@ -21,4 +21,11 @@ export async function ladeDaten(buf: ArrayBuffer): Promise<Kochbuch> {
   return pruefeKochbuch(daten);
 }
 
-export const ladeDatei = async (datei: Blob): Promise<Kochbuch> => ladeDaten(await datei.arrayBuffer());
+/** Eine rezepte.json hat einige hundert Kilobyte. Eine viel grössere Datei ist sicher die falsche. */
+export const MAX_BYTES = 20 * 1024 * 1024;
+
+export async function ladeDatei(datei: Blob): Promise<Kochbuch> {
+  // Vor dem Einlesen prüfen: Eine grosse, falsch gewählte Datei käme sonst ganz in den Speicher
+  if (datei.size > MAX_BYTES) throw new DatenFehler('Die Datei ist zu gross für eine Rezeptdatei (höchstens 20 MB).');
+  return ladeDaten(await datei.arrayBuffer());
+}

@@ -1,5 +1,6 @@
 import { signal } from '@preact/signals';
-import { useEffect } from 'preact/hooks';
+import type { ComponentChildren } from 'preact';
+import { useEffect, useErrorBoundary } from 'preact/hooks';
 import { href, route } from './router';
 import { bereit, zettel } from './state';
 import { Toast } from './ui/toast';
@@ -54,11 +55,16 @@ function Header() {
   );
 }
 
+/** Eine kaputte %-Folge in der Adresse (z. B. «#/rezept/%E0») bleibt stehen, statt die Seite abzubrechen */
+function entschluessle(teil: string): string {
+  try { return decodeURIComponent(teil); } catch { return teil; }
+}
+
 function Seite() {
   if (!bereit.value) return <p class="boot">Rezepte werden geladen …</p>;
   const seg = route.value.path.split('/').filter(Boolean);
   if (seg[0] === 'rezept' && seg[1]) {
-    const id = decodeURIComponent(seg[1]);
+    const id = entschluessle(seg[1]);
     return <RezeptSeite key={id} id={id} />;
   }
   if (seg[0] === 'einkauf') return <Einkauf />;
@@ -66,12 +72,24 @@ function Seite() {
   return <Rezepte />;
 }
 
+/** Fehler beim Zeichnen einer Seite: Hinweis statt leerer Seite, die Navigation oben bleibt nutzbar */
+function Auffang({ children }: { children: ComponentChildren }) {
+  const [fehler] = useErrorBoundary(e => console.error(e));
+  if (!fehler) return <>{children}</>;
+  return (
+    <div class="page">
+      <p class="panel-note is-bad" role="alert">Diese Seite liess sich nicht anzeigen. Wähle oben eine andere Seite oder lade die App neu.</p>
+    </div>
+  );
+}
+
 export function App() {
   useEffect(() => applyTheme(theme.value), [theme.value]);
+  // Ein neuer Schlüssel pro Seite setzt den Fehlerhinweis beim Seitenwechsel zurück
   return (
     <>
       <Header />
-      <main><Seite /></main>
+      <main><Auffang key={route.value.path}><Seite /></Auffang></main>
       <Toast />
     </>
   );

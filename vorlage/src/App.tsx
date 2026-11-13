@@ -2,7 +2,7 @@
  * Vorlage: Kopfzeile mit «Alle Apps», Eingaben, Ergebnis. Aussehen aus der gemeinsamen Basis
  * (gemeinsam/basis.css: .top, .card, .feld, .gross, .eckdaten …), hier nur die Inhalte.
  */
-import { useEffect, useState } from 'preact/hooks';
+import { useLayoutEffect, useState } from 'preact/hooks';
 import { type Fehler, type Formular, lesen, ohm } from './logic/beispiel';
 import { anzeige } from './logic/zahlen';
 import { laden, speichern } from './speicher';
@@ -36,7 +36,8 @@ function Feld({ id, label, einheit, info, f, fehler, setze }: FeldProps) {
 
 export function App() {
   const [f, setF] = useState<Formular>(laden);
-  useEffect(() => speichern(f), [f]);
+  // Gleich nach dem Zeichnen speichern, nicht erst im nächsten Frame: sonst fehlt nach sofortigem Neuladen die letzte Eingabe
+  useLayoutEffect(() => speichern(f), [f]);
   const setze = (k: keyof Formular, v: string) => setF(alt => ({ ...alt, [k]: v }));
   const { werte, fehler } = lesen(f);
   const e = werte ? ohm(werte.widerstand, werte.strom) : null;

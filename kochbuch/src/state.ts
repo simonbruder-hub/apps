@@ -1,6 +1,7 @@
 /** Zustand der App: geladene Rezepte (IndexedDB) und Einkaufszettel (localStorage) */
 import { computed, effect, signal } from '@preact/signals';
 import { ladeDatei } from './data/laden';
+import { DatenFehler, pruefeBestand } from './data/pruefen';
 import { dauerhaft, lies, loesche, schreibe } from './data/speicher';
 import type { Bestand, Kochbuch } from './data/types';
 import { LEERER_ZETTEL, type Zettel } from './logic/einkauf';
@@ -9,12 +10,16 @@ export const bereit = signal(false);
 export const bestand = signal<Bestand | null>(null);
 export const buch = computed<Kochbuch | null>(() => bestand.value?.kochbuch ?? null);
 export const speicherFehlt = signal(false);
+/** Die gespeicherten Rezepte liessen sich beim Start nicht lesen (ältere Version oder beschädigt) */
+export const bestandUnlesbar = signal(false);
 
 export async function starte() {
   try {
-    bestand.value = (await lies<Bestand>('bestand')) ?? null;
-  } catch {
-    speicherFehlt.value = true;
+    const gespeichert = await lies<unknown>('bestand');
+    bestand.value = gespeichert == null ? null : pruefeBestand(gespeichert);
+  } catch (e) {
+    if (e instanceof DatenFehler) bestandUnlesbar.value = true;
+    else speicherFehlt.value = true;
   } finally {
     bereit.value = true;
   }
@@ -25,6 +30,7 @@ export async function importiere(datei: File): Promise<Kochbuch> {
   const neu: Bestand = { kochbuch, datei: datei.name, geladen: new Date().toISOString() };
   await schreibe('bestand', neu);
   bestand.value = neu;
+  bestandUnlesbar.value = false;
   // Rezepte, die es nicht mehr gibt, vom Zettel nehmen
   const ids = new Set(kochbuch.rezepte.map(r => r.id));
   zettel.value = { ...zettel.value, rezepte: zettel.value.rezepte.filter(e => ids.has(e.id)) };

@@ -7,6 +7,7 @@ import {
   anzahlAktiv, anzahlMit, filterAus, filterQuery, filtere, type Filter, type Gruppe, jahreszeitAm,
   JAHRESZEIT_NAME, LEER, MAGEN_NAME, saisonText, umschalten,
 } from '../logic/filter';
+import { anzahl } from '../logic/text';
 import { href, route, setzeQuery } from '../router';
 import { buch, zettel } from '../state';
 import { Ampel, MagenBadge } from '../ui/bits';
@@ -102,7 +103,7 @@ function Liste({ b }: { b: Kochbuch }) {
 
       <div class="ergebnis">
         <p class="treffer">
-          {treffer.length === b.rezepte.length ? `${b.rezepte.length} Rezepte` : `${treffer.length} von ${b.rezepte.length} Rezepten`}
+          {treffer.length === b.rezepte.length ? anzahl(b.rezepte.length, 'Rezept', 'Rezepte') : `${treffer.length} von ${b.rezepte.length} Rezepten`}
           {n > 0 && <button type="button" class="link" onClick={() => setze(LEER)}>Filter zurücksetzen</button>}
         </p>
         {treffer.length
