@@ -112,6 +112,10 @@ die App unter `https://simonbruder-hub.github.io/apps/taktwerk/app/`.
   Desktop-Release. Neu: `../../konten/zugang.sql` (Konten nur für freigeschaltete Adressen, Hook «Before User
   Created»), geprüft mit `npm run db:test`; Anleitung `../../konten/README.md`. Im selben Browser teilen Taktwerk und
   Haushalt die Anmeldung.
+- **Code-Audit Konto und Abgleich** (Aufgabe 8, PR `simonbruder-hub/apps#18`): «Abmelden» beendet nur noch die
+  Sitzung dieses Geräts (vorher alle Geräte des Kontos), Sitzungen aus Links in der Adresse werden nicht übernommen
+  (angemeldet wird nur mit Code), Meldungen ohne Gedankenstrich. Schema und Zugriffsregeln ohne Befund. Offene Teile
+  des Audits und optionale Funde: `../../docs/AUFGABEN.md`, Aufgabe 8, und der PR.
 
 ## Offen
 

@@ -24,9 +24,14 @@ import {
 
 /* ---------- Client und Anmeldung (E-Mail-Code) ---------- */
 
+/**
+ * Angemeldet wird nur mit dem Code aus der Mail. Sitzungen aus einem Link in der Adresse werden darum nicht
+ * übernommen: Sonst könnte ein präparierter Link ein fremdes Konto anmelden, und noch nicht gebundene lokale
+ * Daten landeten beim ersten Abgleich dort (wie in der Haushalt-App, die dasselbe Konto nutzt).
+ */
 export function createSupabaseClient(url: string, anonKey: string): SupabaseClient {
   return createClient(url, anonKey, {
-    auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true },
+    auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false },
   });
 }
 
@@ -43,21 +48,25 @@ export async function sendLoginCode(client: SupabaseClient, email: string): Prom
 export async function verifyLoginCode(client: SupabaseClient, email: string, code: string): Promise<void> {
   const { data, error } = await client.auth.verifyOtp({ email: email.trim(), token: code.trim(), type: 'email' });
   if (error) throw mapAuthError(error);
-  if (!data.session) throw new RemoteError('auth', 'Anmeldung fehlgeschlagen – bitte neuen Code anfordern.');
+  if (!data.session) throw new RemoteError('auth', 'Anmeldung fehlgeschlagen. Bitte einen neuen Code anfordern.');
 }
 
+/**
+ * Meldet nur dieses Gerät ab. Der Standard von supabase-js («global») beendet alle Sitzungen des Kontos:
+ * Nach spätestens einer Stunde wären auch Handy, Desktop-App und die Haushalt-App abgemeldet.
+ */
 export async function signOut(client: SupabaseClient): Promise<void> {
-  const { error } = await client.auth.signOut();
+  const { error } = await client.auth.signOut({ scope: 'local' });
   if (error) throw mapAuthError(error);
 }
 
 /** Fehler von Supabase Auth in einen RemoteError mit deutscher Meldung übersetzen. */
 export function mapAuthError(error: unknown): RemoteError {
   if (isAuthRetryableFetchError(error)) {
-    return new RemoteError('network', 'Keine Verbindung zum Server – bitte später erneut versuchen.', { cause: error });
+    return new RemoteError('network', 'Keine Verbindung zum Server. Bitte später erneut versuchen.', { cause: error });
   }
   if (isAuthError(error)) {
-    if (error.status === 429) return new RemoteError('auth', 'Zu viele Versuche – bitte einen Moment warten.', { cause: error });
+    if (error.status === 429) return new RemoteError('auth', 'Zu viele Versuche. Bitte einen Moment warten.', { cause: error });
     if (error.code === 'otp_expired' || /otp|token/i.test(error.message)) {
       return new RemoteError('auth', 'Der Code ist ungültig oder abgelaufen.', { cause: error });
     }
@@ -362,7 +371,7 @@ export class SupabaseRemote implements RemoteStore {
     const { data, error } = await this.client.auth.getSession();
     if (data.session) return data.session.user.id;
     if (isAuthRetryableFetchError(error)) {
-      throw new RemoteError('network', 'Server nicht erreichbar – Anmeldung kann nicht erneuert werden.', { cause: error });
+      throw new RemoteError('network', 'Server nicht erreichbar, die Anmeldung kann nicht erneuert werden.', { cause: error });
     }
     return null;
   }

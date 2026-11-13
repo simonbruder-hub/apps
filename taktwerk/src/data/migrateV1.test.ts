@@ -393,8 +393,8 @@ describe('migrateV1 – robuste Eingaben', () => {
   });
 
   it('ungültiges JSON und falsche Form werden gemeldet', async () => {
-    expect((await migrateV1('{kaputt', repo)).warnings).toEqual(['Die v1-Daten sind kein gültiges JSON – nichts übernommen.']);
-    expect((await migrateV1([1, 2], repo)).warnings).toEqual(['Keine gültigen v1-Daten gefunden – nichts übernommen.']);
+    expect((await migrateV1('{kaputt', repo)).warnings).toEqual(['Die v1-Daten sind kein gültiges JSON, nichts übernommen.']);
+    expect((await migrateV1([1, 2], repo)).warnings).toEqual(['Keine gültigen v1-Daten gefunden, nichts übernommen.']);
     expect(await repo.list('projects')).toHaveLength(0);
   });
 

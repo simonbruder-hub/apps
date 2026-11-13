@@ -230,12 +230,12 @@ function parseInput(oldJson: unknown, warnings: string[]): Record<string, unknow
     try {
       raw = JSON.parse(raw);
     } catch {
-      warnings.push('Die v1-Daten sind kein gültiges JSON – nichts übernommen.');
+      warnings.push('Die v1-Daten sind kein gültiges JSON, nichts übernommen.');
       return null;
     }
   }
   if (!isObject(raw)) {
-    warnings.push('Keine gültigen v1-Daten gefunden – nichts übernommen.');
+    warnings.push('Keine gültigen v1-Daten gefunden, nichts übernommen.');
     return null;
   }
   return raw;

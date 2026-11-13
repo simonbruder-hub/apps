@@ -254,7 +254,7 @@ function SyncCard() {
     return (
       <section class="card" id="sync">
         <h2>Sync & Konto</h2>
-        <p class="small">Deine Daten liegen nur auf diesem Gerät. Mit einem kostenlosen Supabase-Projekt synchronisieren Laptop und Handy –{' '}
+        <p class="small">Deine Daten liegen nur auf diesem Gerät. Mit einem kostenlosen Supabase-Projekt synchronisieren Laptop und Handy, siehe{' '}
           <a href="https://github.com/simonbruder-hub/apps/blob/main/taktwerk/supabase/README.md" target="_blank" rel="noopener">Anleitung</a>.</p>
         <form class="stack" onSubmit={(e) => { e.preventDefault(); if (!valid) return; saveBackendConfig({ url: url.trim().replace(/\/$/, ''), anonKey: key.trim() }); location.reload(); }}>
           <div class="field"><label for="sbUrl">Supabase-URL</label>
@@ -288,7 +288,7 @@ function SyncCard() {
           <button type="button" class="btn btn-ghost" disabled={busy} onClick={() => void run(async () => { await signOut(supabase); location.reload(); })}><Icon name="user" />Abmelden</button>
         </div>
       ) : step === 'email' ? (
-        <form class="stack" style={{ marginTop: '12px' }} onSubmit={(e) => { e.preventDefault(); void run(async () => { await sendLoginCode(supabase, email); setStep('code'); toast('Code gesendet – schau in dein Postfach.'); }); }}>
+        <form class="stack" style={{ marginTop: '12px' }} onSubmit={(e) => { e.preventDefault(); void run(async () => { await sendLoginCode(supabase, email); setStep('code'); toast('Code gesendet. Schau in dein Postfach.'); }); }}>
           <div class="field"><label for="loginMail">E-Mail-Adresse</label>
             <input id="loginMail" type="email" required autocomplete="email" value={email} onInput={(e) => setEmail(e.currentTarget.value)} /></div>
           <div><button type="submit" class="btn btn-primary" disabled={busy || !email.includes('@')}>Anmeldecode senden</button></div>
